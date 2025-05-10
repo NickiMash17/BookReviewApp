@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add DbContext with SQL Server
+// Database Configuration
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection"),
@@ -25,18 +25,17 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     .EnableSensitiveDataLogging(builder.Environment.IsDevelopment())
     .EnableDetailedErrors(builder.Environment.IsDevelopment()));
 
-// Add Repository
-builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-
-// Add Services
+// Repository and Service Registration
+builder.Services.AddScoped(typeof(BookReviewApp.Domain.Interfaces.IRepository<>), 
+                         typeof(BookReviewApp.Data.Repositories.Repository<>));
 builder.Services.AddScoped<IBookService, BookService>();
 
-// Add MVC services
+// MVC Configuration
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// Configure pipeline
+// Configure HTTP Pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -59,15 +58,13 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
-        // Ensure database is created and migrations are applied
-        context.Database.Migrate(); 
-        // Seed the database
-        SeedData.Initialize(services);
+        await context.Database.MigrateAsync();
+        await SeedData.InitializeAsync(services);
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred seeding the DB.");
+        logger.LogError(ex, "An error occurred while seeding the database.");
     }
 }
 

@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 
-namespace BookReviewApp.Domain.Interfaces
+namespace BookReviewApp.Data.Repositories
 {
     public interface IRepository<T> where T : class
     {

@@ -15,14 +15,18 @@ namespace BookReviewApp.Web.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var books = await _bookService.GetAllBooksAsync();
+            var books = await _bookService.GetAllBooksWithAuthorsAsync();
             return View(books);
         }
 
         public async Task<IActionResult> Details(int id)
         {
             var book = await _bookService.GetBookByIdAsync(id);
-            if (book == null) return NotFound();
+            if (book == null)
+            {
+                return NotFound();
+            }
+            
             return View(book);
         }
 
