@@ -14,27 +14,22 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var book in Model)
+            @foreach (var item in Model)
             {
                 <tr>
                     <td>
-                        @if (!string.IsNullOrEmpty(book.CoverImageUrl))
-                        {
-                            <img src="@book.CoverImageUrl" class="img-thumbnail" style="max-height: 100px;" alt="@book.Title cover">
-                        }
-                        else
-                        {
-                            <img src="/images/no-cover.png" class="img-thumbnail" style="max-height: 100px;" alt="No cover available">
-                        }
+                        <img src="@(item.CoverImageUrl ?? "https://via.placeholder.com/150?text=No+Cover")" 
+                             class="book-cover"
+                             alt="@item.Title cover">
                     </td>
-                    <td>@book.Title</td>
-                    <td>@(book.Author?.Name ?? "Unknown")</td>
-                    <td>@book.PublishedDate.ToShortDateString()</td>
+                    <td>@item.Title</td>
+                    <td>@(item.Author?.Name ?? "Unknown")</td>
+                    <td>@item.PublishedDate.ToString("MM/dd/yyyy")</td>
                     <td>
                         <div class="btn-group" role="group">
-                            <a asp-action="Details" asp-route-id="@book.BookId" class="btn btn-info btn-sm">Details</a>
-                            <a asp-action="Edit" asp-route-id="@book.BookId" class="btn btn-warning btn-sm">Edit</a>
-                            <a asp-action="Delete" asp-route-id="@book.BookId" class="btn btn-danger btn-sm">Delete</a>
+                            <a asp-action="Details" asp-route-id="@item.BookId" class="btn btn-info btn-sm">Details</a>
+                            <a asp-action="Edit" asp-route-id="@item.BookId" class="btn btn-warning btn-sm">Edit</a>
+                            <a asp-action="Delete" asp-route-id="@item.BookId" class="btn btn-danger btn-sm">Delete</a>
                         </div>
                     </td>
                 </tr>
@@ -46,3 +41,15 @@
         <a asp-action="Create" class="btn btn-primary">Add New Book</a>
     </p>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('img').forEach(img => {
+                img.addEventListener('error', function() {
+                    this.src = 'https://via.placeholder.com/150?text=No+Cover';
+                });
+            });
+        });
+    </script>
+}
