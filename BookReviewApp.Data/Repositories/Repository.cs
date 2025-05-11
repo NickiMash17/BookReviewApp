@@ -5,54 +5,61 @@ using System.Linq.Expressions;
 
 namespace BookReviewApp.Data.Repositories
 {
-    public class Repository<T> : BookReviewApp.Domain.Interfaces.IRepository<T> where T : class
+    public class Repository<T> : IRepository<T> where T : class
     {
-        private readonly ApplicationDbContext _context;
+        protected readonly ApplicationDbContext _context;
+        protected readonly DbSet<T> _dbSet;
 
         public Repository(ApplicationDbContext context)
         {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _context = context;
+            _dbSet = context.Set<T>();
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync(Func<IQueryable<T>, IQueryable<T>>? include = null)
+        public virtual async Task<IEnumerable<T>> GetAllAsync(Func<IQueryable<T>, IQueryable<T>>? include = null)
         {
-            var query = _context.Set<T>().AsQueryable();
-            if (include != null) query = include(query);
+            var query = _dbSet.AsQueryable();
+            if (include != null)
+            {
+                query = include(query);
+            }
             return await query.ToListAsync();
         }
 
-        public async Task<T?> GetByIdAsync(int id, Func<IQueryable<T>, IQueryable<T>>? include = null)
+        public virtual async Task<T?> GetByIdAsync(int id, Func<IQueryable<T>, IQueryable<T>>? include = null)
         {
-            var query = _context.Set<T>().AsQueryable();
+            var query = _dbSet.AsQueryable();
             if (include != null) query = include(query);
-            return await query.FirstOrDefaultAsync(e => EF.Property<int>(e, "Id") == id);
+            
+            return await query.FirstOrDefaultAsync(e => 
+                EF.Property<int>(e, $"{typeof(T).Name}Id") == id);
         }
 
-        public async Task AddAsync(T entity)
+        public virtual async Task AddAsync(T entity)
         {
-            await _context.Set<T>().AddAsync(entity);
+            await _dbSet.AddAsync(entity);
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateAsync(T entity)
+        public virtual async Task UpdateAsync(T entity)
         {
-            _context.Set<T>().Update(entity);
+            _dbSet.Update(entity);
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(int id)
+        public virtual async Task DeleteAsync(int id)
         {
             var entity = await GetByIdAsync(id);
             if (entity != null)
             {
-                _context.Set<T>().Remove(entity);
+                _dbSet.Remove(entity);
                 await _context.SaveChangesAsync();
             }
         }
 
-        public async Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate)
+        public virtual async Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate)
         {
-            return await _context.Set<T>().AnyAsync(predicate);
+            return await _dbSet.AnyAsync(predicate);
         }
     }
 }

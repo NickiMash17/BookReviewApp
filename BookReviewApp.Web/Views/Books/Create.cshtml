@@ -1,0 +1,101 @@
+@model BookReviewApp.Domain.Models.Book
+
+<h1>Add New Book</h1>
+
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Create" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <!-- Basic Book Information -->
+            <div class="form-group">
+                <label asp-for="Title" class="control-label">Book Title</label>
+                <input asp-for="Title" class="form-control" placeholder="Enter the full title of the book" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+                <small class="form-text text-muted">Include subtitle if applicable</small>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="AuthorId" class="control-label">Author</label>
+                <select asp-for="AuthorId" asp-items="ViewBag.Authors" class="form-control">
+                    <option value="">-- Select Author --</option>
+                </select>
+                <span asp-validation-for="AuthorId" class="text-danger"></span>
+            </div>
+
+            <!-- Publishing Details -->
+            <div class="form-group">
+                <label asp-for="ISBN" class="control-label">ISBN</label>
+                <input asp-for="ISBN" class="form-control" placeholder="Enter 13-digit ISBN" />
+                <span asp-validation-for="ISBN" class="text-danger"></span>
+                <small class="form-text text-muted">Format: 978-XXXXXXXXXX</small>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="PublishedDate" class="control-label">Publication Date</label>
+                <input asp-for="PublishedDate" class="form-control" type="date" />
+                <span asp-validation-for="PublishedDate" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Price" class="control-label">Price (USD)</label>
+                <input asp-for="Price" class="form-control" placeholder="19.99" />
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+
+            <!-- Book Details -->
+            <div class="form-group">
+                <label asp-for="Description" class="control-label">Book Description</label>
+                <textarea asp-for="Description" class="form-control" rows="5" 
+                          placeholder="Enter a compelling description of the book"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+                <small class="form-text text-muted">Recommended: 200-500 characters</small>
+            </div>
+
+            <!-- Cover Image Upload -->
+            <div class="form-group">
+                <label for="CoverImage" class="control-label">Cover Image</label>
+                <input type="file" id="CoverImage" name="CoverImage" class="form-control" 
+                       accept="image/jpeg,image/png" />
+                <small class="form-text text-muted">Recommended size: 600x900 pixels, max 2MB</small>
+            </div>
+
+            <div class="form-group mt-4">
+                <button type="submit" class="btn btn-primary">Create Book</button>
+                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+            </div>
+        </form>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Tips for Adding Books</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li>✓ Verify ISBN on the book's copyright page</li>
+                    <li>✓ Use high-quality cover images</li>
+                    <li>✓ Write clear, concise descriptions</li>
+                    <li>✓ Double-check publication date</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Show preview of uploaded cover image
+        document.getElementById('CoverImage').addEventListener('change', function (e) {
+            if (e.target.files && e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    // You could add preview image display logic here
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+    </script>
+}
