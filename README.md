@@ -1,5 +1,9 @@
 # 📚 Book Review App
 
+![Original Work](https://img.shields.io/badge/Handcrafted%20by-Nicolette%20Mashaba-blueviolet?style=for-the-badge)
+
+> **Original work by Nicolette Mashaba (nickimash). All UI/UX, code, and design are handcrafted and proudly owned.**
+
 A modern, full-stack web application for managing books, authors, and reviews. Built with ASP.NET Core, Entity Framework, and Bootstrap 5.
 
 ![Book Review App](https://img.shields.io/badge/.NET-6.0-blue?style=for-the-badge&logo=.net)
@@ -189,12 +193,17 @@ ENTRYPOINT ["dotnet", "BookReviewApp.Web.dll"]
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 👨‍💻 Author
+## 👩‍💻 Author & Branding
 
-**Your Name**
-- GitHub: [@yourusername](https://github.com/yourusername)
-- LinkedIn: [Your LinkedIn](https://linkedin.com/in/yourprofile)
-- Portfolio: [Your Portfolio](https://yourportfolio.com)
+**Nicolette Mashaba**  
+Full Stack Developer | Polokwane, South Africa
+
+- Portfolio: [nickimash.vercel.app](https://nickimash.vercel.app/)
+- LinkedIn: [in/nicolette-mashaba-b094a5221](https://www.linkedin.com/in/nicolette-mashaba-b094a5221)
+- Email: nene171408@gmail.com
+- GitHub: [@nickimash](https://github.com/nickimash)
+
+> All code, UI/UX, and design are original and proudly authored by Nicolette Mashaba (nickimash). Do not copy or redistribute without permission.
 
 ## 🙏 Acknowledgments
 
@@ -249,5 +258,13 @@ By default, the app uses SQLite for easy local development. To use SQL Server (e
 - For production, review and update your connection string and security settings as needed.
 
 ---
+
+## 🌟 What's Unique?
+
+- **Creative Trademark Badge:** Fixed, stylish badge with personal links (LinkedIn, portfolio, email) on every page.
+- **Beautiful Privacy Page:** Modern, animated, and creative privacy policy with a quote, shield icon, and developer info.
+- **Image Placeholders:** All book/author images use placeholders to prevent flickering or broken images (notably for 'American Gods' and 'Harry Potter and the Prisoner of Azkaban').
+- **Authorship Assertion:** All major files include clear comments asserting original work by Nicolette Mashaba (nickimash).
+- **UI/UX Polish:** Modern gradients, smooth animations, and a mobile-first, accessible design.
 
 Developed with ❤️ by Nicolette Mashaba
