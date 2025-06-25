@@ -1,0 +1,11 @@
+--2025-06-25 08:14:42--  https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400
+Resolving images.unsplash.com (images.unsplash.com)... 151.101.130.208, 151.101.2.208, 151.101.66.208, ...
+Connecting to images.unsplash.com (images.unsplash.com)|151.101.130.208|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 28342 (28K) [image/jpeg]
+Saving to: ‘BookReviewApp.Web/wwwroot/images/default-book.png’
+
+           BookReviewA   0%[                           ]       0  --.-KB/s               BookReviewApp.Web/wwwr 100%[==========================>]  27.68K  --.-KB/s    in 0.03s   
+
+2025-06-25 08:14:43 (839 KB/s) - ‘BookReviewApp.Web/wwwroot/images/default-book.png’ saved [28342/28342]
+

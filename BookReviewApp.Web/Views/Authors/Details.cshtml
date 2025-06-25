@@ -1,0 +1,138 @@
+@model BookReviewApp.Domain.Models.Author
+
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<div class="container">
+    <div class="row">
+        <!-- Author Information -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="mb-0">
+                        <i class="bi bi-person"></i> @Model.Name
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <img src="@(Model.PhotoUrl ?? "/images/no-author-photo.png")" 
+                                 class="img-fluid rounded" 
+                                 alt="Photo of @Model.Name"
+                                 onerror="this.src='/images/no-author-photo.png'" />
+                        </div>
+                        <div class="col-md-8">
+                            <dl class="row">
+                                @if (Model.DateOfBirth != default)
+                                {
+                                    <dt class="col-sm-4">Date of Birth</dt>
+                                    <dd class="col-sm-8">@Model.DateOfBirth.ToString("MMMM d, yyyy")</dd>
+                                }
+
+                                @if (!string.IsNullOrEmpty(Model.Biography))
+                                {
+                                    <dt class="col-sm-4">Biography</dt>
+                                    <dd class="col-sm-8">@Model.Biography</dd>
+                                }
+                            </dl>
+
+                            <div class="mt-3">
+                                <a asp-action="Edit" asp-route-id="@Model.AuthorId" class="btn btn-warning">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@Model.AuthorId" class="btn btn-danger">
+                                    <i class="bi bi-trash"></i> Delete
+                                </a>
+                                <a asp-action="Index" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-left"></i> Back to List
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Books Section -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h3 class="mb-0">
+                        <i class="bi bi-book"></i> Books by @Model.Name
+                    </h3>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.Books != null && ((IEnumerable<BookReviewApp.Domain.Models.Book>)ViewBag.Books).Any())
+                    {
+                        <div class="row">
+                            @foreach (var book in (IEnumerable<BookReviewApp.Domain.Models.Book>)ViewBag.Books)
+                            {
+                                <div class="col-md-6 mb-3">
+                                    <div class="card h-100">
+                                        <div class="row g-0">
+                                            <div class="col-md-4">
+                                                <img src="@(book.CoverImageUrl ?? "/images/no-cover.png")" 
+                                                     class="img-fluid rounded-start h-100" 
+                                                     style="object-fit: cover;"
+                                                     alt="Cover of @book.Title"
+                                                     onerror="this.src='/images/no-cover.png'" />
+                                            </div>
+                                            <div class="col-md-8">
+                                                <div class="card-body">
+                                                    <h6 class="card-title">@book.Title</h6>
+                                                    <p class="card-text small text-muted">
+                                                        <i class="bi bi-calendar"></i> @book.PublishedDate.ToString("yyyy")
+                                                    </p>
+                                                    <p class="card-text small">
+                                                        <i class="bi bi-currency-dollar"></i> @book.Price.ToString("F2")
+                                                    </p>
+                                                    <a asp-action="Details" asp-controller="Books" asp-route-id="@book.BookId" 
+                                                       class="btn btn-primary btn-sm">
+                                                        <i class="bi bi-eye"></i> View Details
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted py-4">
+                            <i class="bi bi-book" style="font-size: 3rem;"></i>
+                            <p class="mt-2">No books found for this author.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle"></i> Author Details
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <strong>Added:</strong> @Model.CreatedAt.ToString("MMM d, yyyy")
+                        </li>
+                        @if (Model.UpdatedAt.HasValue)
+                        {
+                            <li class="mb-2">
+                                <strong>Updated:</strong> @Model.UpdatedAt.Value.ToString("MMM d, yyyy")
+                            </li>
+                        }
+                        <li class="mb-2">
+                            <strong>Books:</strong> @(((IEnumerable<BookReviewApp.Domain.Models.Book>)ViewBag.Books)?.Count() ?? 0)
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

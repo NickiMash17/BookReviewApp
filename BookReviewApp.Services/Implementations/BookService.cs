@@ -45,5 +45,12 @@ namespace BookReviewApp.Services.Implementations
             return await _bookRepository.GetAllAsync(
                 include: query => query.Include(b => b.Author));
         }
+
+        public async Task<IEnumerable<Book>> GetBooksByAuthorIdAsync(int authorId)
+        {
+            return await _bookRepository.GetAllAsync(
+                filter: query => query.Where(b => b.AuthorId == authorId),
+                include: query => query.Include(b => b.Author));
+        }
     }
 }

@@ -1,0 +1,102 @@
+using BookReviewApp.Domain.Interfaces;
+using BookReviewApp.Domain.Models;
+using BookReviewApp.Services.Interfaces;
+using System.Security.Cryptography;
+using System.Text;
+
+namespace BookReviewApp.Services.Implementations
+{
+    public class UserService : IUserService
+    {
+        private readonly IRepository<User> _userRepository;
+
+        public UserService(IRepository<User> userRepository)
+        {
+            _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
+        }
+
+        public async Task<IEnumerable<User>> GetAllUsersAsync()
+        {
+            return await _userRepository.GetAllAsync();
+        }
+
+        public async Task<User?> GetUserByIdAsync(int id)
+        {
+            return await _userRepository.GetByIdAsync(id);
+        }
+
+        public async Task<User?> GetUserByEmailAsync(string email)
+        {
+            var users = await _userRepository.GetAllAsync(
+                filter: query => query.Where(u => u.Email == email));
+            return users.FirstOrDefault();
+        }
+
+        public async Task<User?> GetUserByUsernameAsync(string username)
+        {
+            var users = await _userRepository.GetAllAsync(
+                filter: query => query.Where(u => u.Username == username));
+            return users.FirstOrDefault();
+        }
+
+        public async Task<User> AddUserAsync(User user)
+        {
+            // Hash the password before saving
+            user.PasswordHash = HashPassword(user.PasswordHash);
+            await _userRepository.AddAsync(user);
+            return user;
+        }
+
+        public async Task UpdateUserAsync(User user)
+        {
+            await _userRepository.UpdateAsync(user);
+        }
+
+        public async Task DeleteUserAsync(int id)
+        {
+            await _userRepository.DeleteAsync(id);
+        }
+
+        public async Task<bool> UserExistsAsync(int id)
+        {
+            return await _userRepository.ExistsAsync(u => u.UserId == id);
+        }
+
+        public async Task<bool> EmailExistsAsync(string email)
+        {
+            return await _userRepository.ExistsAsync(u => u.Email == email);
+        }
+
+        public async Task<bool> UsernameExistsAsync(string username)
+        {
+            return await _userRepository.ExistsAsync(u => u.Username == username);
+        }
+
+        public async Task<bool> ValidateCredentialsAsync(string email, string password)
+        {
+            var user = await GetUserByEmailAsync(email);
+            if (user == null || !user.IsActive)
+                return false;
+
+            var hashedPassword = HashPassword(password);
+            return user.PasswordHash == hashedPassword;
+        }
+
+        public async Task UpdateLastLoginAsync(int userId)
+        {
+            var user = await GetUserByIdAsync(userId);
+            if (user != null)
+            {
+                user.LastLoginDate = DateTime.Now;
+                await _userRepository.UpdateAsync(user);
+            }
+        }
+
+        private static string HashPassword(string password)
+        {
+            using var sha256 = SHA256.Create();
+            var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+            return Convert.ToBase64String(hashedBytes);
+        }
+    }
+} 

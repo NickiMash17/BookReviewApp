@@ -1,0 +1,455 @@
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<!-- Dashboard Header -->
+<div class="dashboard-header text-white text-center py-5 mb-5">
+    <div class="container">
+        <h1 class="display-4 fw-bold mb-3">
+            <i class="bi bi-graph-up"></i> Analytics Dashboard
+        </h1>
+        <p class="lead mb-0">Comprehensive insights into your book review platform</p>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="container mb-5">
+    <div class="row">
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="stat-card stat-primary">
+                <div class="stat-icon">
+                    <i class="bi bi-book"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-number">@ViewBag.TotalBooks</h3>
+                    <p class="stat-label">Total Books</p>
+                    <div class="stat-change positive">
+                        <i class="bi bi-arrow-up"></i> +12% this month
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="stat-card stat-success">
+                <div class="stat-icon">
+                    <i class="bi bi-people"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-number">@ViewBag.TotalAuthors</h3>
+                    <p class="stat-label">Authors</p>
+                    <div class="stat-change positive">
+                        <i class="bi bi-arrow-up"></i> +8% this month
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="stat-card stat-warning">
+                <div class="stat-icon">
+                    <i class="bi bi-star"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-number">@ViewBag.TotalReviews</h3>
+                    <p class="stat-label">Reviews</p>
+                    <div class="stat-change positive">
+                        <i class="bi bi-arrow-up"></i> +15% this month
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="stat-card stat-info">
+                <div class="stat-icon">
+                    <i class="bi bi-heart"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-number">@ViewBag.AverageRating</h3>
+                    <p class="stat-label">Avg Rating</p>
+                    <div class="stat-change positive">
+                        <i class="bi bi-arrow-up"></i> +0.2 this month
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts and Analytics -->
+<div class="container mb-5">
+    <div class="row">
+        <!-- Monthly Activity Chart -->
+        <div class="col-lg-8 mb-4">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-graph-up text-primary"></i> Monthly Activity
+                    </h5>
+                </div>
+                <div class="chart-body">
+                    <canvas id="monthlyChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Rating Distribution -->
+        <div class="col-lg-4 mb-4">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-pie-chart text-success"></i> Rating Distribution
+                    </h5>
+                </div>
+                <div class="chart-body">
+                    <canvas id="ratingChart" width="200" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Content Sections -->
+<div class="container">
+    <div class="row">
+        <!-- Top Rated Books -->
+        <div class="col-lg-6 mb-4">
+            <div class="content-card">
+                <div class="content-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-star-fill text-warning"></i> Top Rated Books
+                    </h5>
+                    <a asp-controller="Books" asp-action="Index" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="content-body">
+                    @if (ViewBag.TopRatedBooks != null && ((IEnumerable<object>)ViewBag.TopRatedBooks).Any())
+                    {
+                        @foreach (var book in ViewBag.TopRatedBooks)
+                        {
+                            <div class="content-item">
+                                <div class="content-item-image">
+                                    <img src="@(book.CoverImageUrl ?? "/images/no-cover.png")" 
+                                         alt="@book.Title"
+                                         onerror="this.src='/images/no-cover.png'" />
+                                </div>
+                                <div class="content-item-info">
+                                    <h6 class="content-item-title">@book.Title</h6>
+                                    <p class="content-item-subtitle">@(book.Author?.Name ?? "Unknown")</p>
+                                    <div class="content-item-rating">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            <i class="bi bi-star-fill text-warning"></i>
+                                        }
+                                        <span class="ms-2">4.5</span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted py-3">
+                            <i class="bi bi-book" style="font-size: 2rem;"></i>
+                            <p class="mt-2">No books available</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Reviews -->
+        <div class="col-lg-6 mb-4">
+            <div class="content-card">
+                <div class="content-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-chat-dots text-info"></i> Recent Reviews
+                    </h5>
+                    <a href="#" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="content-body">
+                    @if (ViewBag.RecentReviews != null && ((IEnumerable<object>)ViewBag.RecentReviews).Any())
+                    {
+                        @foreach (var review in ViewBag.RecentReviews)
+                        {
+                            <div class="content-item">
+                                <div class="content-item-avatar">
+                                    <i class="bi bi-person-circle"></i>
+                                </div>
+                                <div class="content-item-info">
+                                    <h6 class="content-item-title">@(review.User?.Username ?? "Anonymous")</h6>
+                                    <p class="content-item-subtitle">@review.Book?.Title</p>
+                                    <div class="content-item-rating">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            if (i <= review.Rating)
+                                            {
+                                                <i class="bi bi-star-fill text-warning"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-star text-muted"></i>
+                                            }
+                                        }
+                                        <span class="ms-2">@review.Rating/5</span>
+                                    </div>
+                                </div>
+                                <div class="content-item-time">
+                                    <small class="text-muted">@review.ReviewDate.ToString("MMM d")</small>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted py-3">
+                            <i class="bi bi-chat-dots" style="font-size: 2rem;"></i>
+                            <p class="mt-2">No reviews yet</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .dashboard-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .dashboard-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        pointer-events: none;
+    }
+    
+    .dashboard-header > .container {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+        display: flex;
+        align-items: center;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .stat-card.stat-primary .stat-icon {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+    }
+    
+    .stat-card.stat-success .stat-icon {
+        background: linear-gradient(135deg, #56ab2f, #a8e6cf);
+    }
+    
+    .stat-card.stat-warning .stat-icon {
+        background: linear-gradient(135deg, #f093fb, #f5576c);
+    }
+    
+    .stat-card.stat-info .stat-icon {
+        background: linear-gradient(135deg, #4facfe, #00f2fe);
+    }
+    
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        color: white;
+        font-size: 1.5rem;
+    }
+    
+    .stat-content {
+        flex: 1;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        margin: 0;
+        color: #333;
+    }
+    
+    .stat-label {
+        color: #666;
+        margin: 0.25rem 0;
+        font-size: 0.9rem;
+    }
+    
+    .stat-change {
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    .stat-change.positive {
+        color: #28a745;
+    }
+    
+    .stat-change.negative {
+        color: #dc3545;
+    }
+    
+    .chart-card, .content-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    
+    .chart-header, .content-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: between;
+        align-items: center;
+    }
+    
+    .chart-body, .content-body {
+        padding: 1.5rem;
+    }
+    
+    .content-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid #f8f9fa;
+    }
+    
+    .content-item:last-child {
+        border-bottom: none;
+    }
+    
+    .content-item-image {
+        width: 50px;
+        height: 70px;
+        margin-right: 1rem;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+    
+    .content-item-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .content-item-avatar {
+        width: 50px;
+        height: 50px;
+        margin-right: 1rem;
+        border-radius: 50%;
+        background: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: #6c757d;
+    }
+    
+    .content-item-info {
+        flex: 1;
+    }
+    
+    .content-item-title {
+        font-weight: bold;
+        margin: 0;
+        color: #333;
+    }
+    
+    .content-item-subtitle {
+        color: #666;
+        margin: 0.25rem 0;
+        font-size: 0.9rem;
+    }
+    
+    .content-item-rating {
+        font-size: 0.8rem;
+    }
+    
+    .content-item-time {
+        text-align: right;
+    }
+</style>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Monthly Activity Chart
+        const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+        new Chart(monthlyCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Books Added',
+                    data: [12, 18, 15, 22, 25, 30],
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    tension: 0.4
+                }, {
+                    label: 'Reviews',
+                    data: [45, 67, 52, 78, 89, 95],
+                    borderColor: '#f093fb',
+                    backgroundColor: 'rgba(240, 147, 251, 0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        
+        // Rating Distribution Chart
+        const ratingCtx = document.getElementById('ratingChart').getContext('2d');
+        new Chart(ratingCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['5 Stars', '4 Stars', '3 Stars', '2 Stars', '1 Star'],
+                datasets: [{
+                    data: [45, 30, 15, 7, 3],
+                    backgroundColor: [
+                        '#28a745',
+                        '#20c997',
+                        '#ffc107',
+                        '#fd7e14',
+                        '#dc3545'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    }
+                }
+            }
+        });
+    </script>
+} 

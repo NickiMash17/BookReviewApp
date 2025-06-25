@@ -16,13 +16,22 @@ namespace BookReviewApp.Data.Repositories
             _dbSet = context.Set<T>();
         }
 
-        public virtual async Task<IEnumerable<T>> GetAllAsync(Func<IQueryable<T>, IQueryable<T>>? include = null)
+        public virtual async Task<IEnumerable<T>> GetAllAsync(
+            Func<IQueryable<T>, IQueryable<T>>? include = null,
+            Func<IQueryable<T>, IQueryable<T>>? filter = null)
         {
             var query = _dbSet.AsQueryable();
+            
+            if (filter != null)
+            {
+                query = filter(query);
+            }
+            
             if (include != null)
             {
                 query = include(query);
             }
+            
             return await query.ToListAsync();
         }
 

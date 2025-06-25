@@ -40,6 +40,7 @@ namespace BookReviewApp.Tests.Services
 
             _mockBookRepository
                 .Setup(repo => repo.GetAllAsync(
+                    It.IsAny<Func<IQueryable<Book>, IQueryable<Book>>>(),
                     It.IsAny<Func<IQueryable<Book>, IQueryable<Book>>>()))
                 .ReturnsAsync(testData);
 
@@ -56,7 +57,9 @@ namespace BookReviewApp.Tests.Services
                        .Including(b => b.Author.Name));
 
             _mockBookRepository.Verify(
-                repo => repo.GetAllAsync(It.IsAny<Func<IQueryable<Book>, IQueryable<Book>>>()), 
+                repo => repo.GetAllAsync(
+                    It.IsAny<Func<IQueryable<Book>, IQueryable<Book>>>(),
+                    It.IsAny<Func<IQueryable<Book>, IQueryable<Book>>>()), 
                 Times.Once);
         }
     }

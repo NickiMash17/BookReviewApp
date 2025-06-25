@@ -12,5 +12,6 @@ namespace BookReviewApp.Services.Interfaces
         Task UpdateBookAsync(Book book);
         Task DeleteBookAsync(int id);
         Task<IEnumerable<Book>> GetAllBooksWithAuthorsAsync();
+        Task<IEnumerable<Book>> GetBooksByAuthorIdAsync(int authorId);
     }
 }

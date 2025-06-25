@@ -1,0 +1,194 @@
+@model BookReviewApp.Domain.Models.Book
+
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<div class="container">
+    <div class="row">
+        <!-- Book Information -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="mb-0">
+                        <i class="bi bi-book"></i> @Model.Title
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <img src="@(Model.CoverImageUrl ?? "/images/no-cover.png")" 
+                                 class="img-fluid rounded" 
+                                 alt="Cover of @Model.Title"
+                                 onerror="this.src='/images/no-cover.png'" />
+                        </div>
+                        <div class="col-md-8">
+                            <dl class="row">
+                                <dt class="col-sm-4">Author</dt>
+                                <dd class="col-sm-8">
+                                    <a href="#" class="text-decoration-none">@(Model.Author?.Name ?? "Unknown")</a>
+                                </dd>
+
+                                <dt class="col-sm-4">ISBN</dt>
+                                <dd class="col-sm-8">@(Model.ISBN ?? "Not specified")</dd>
+
+                                <dt class="col-sm-4">Published Date</dt>
+                                <dd class="col-sm-8">@Model.PublishedDate.ToString("MMMM d, yyyy")</dd>
+
+                                <dt class="col-sm-4">Price</dt>
+                                <dd class="col-sm-8">$@Model.Price.ToString("F2")</dd>
+
+                                @if (!string.IsNullOrEmpty(Model.Description))
+                                {
+                                    <dt class="col-sm-4">Description</dt>
+                                    <dd class="col-sm-8">@Model.Description</dd>
+                                }
+                            </dl>
+
+                            <div class="mt-3">
+                                <a asp-action="Edit" asp-route-id="@Model.BookId" class="btn btn-warning">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@Model.BookId" class="btn btn-danger">
+                                    <i class="bi bi-trash"></i> Delete
+                                </a>
+                                <a asp-action="Index" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-left"></i> Back to List
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reviews Section -->
+            <div class="card mt-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">
+                        <i class="bi bi-star"></i> Reviews
+                    </h3>
+                    <div class="d-flex align-items-center gap-2">
+                        @if (ViewBag.AverageRating != null && ViewBag.AverageRating > 0)
+                        {
+                            <span class="badge bg-primary">
+                                <i class="bi bi-star-fill"></i> @ViewBag.AverageRating.ToString("F1") / 5.0
+                            </span>
+                        }
+                        <a asp-action="Create" asp-controller="Reviews" asp-route-bookId="@Model.BookId" 
+                           class="btn btn-success btn-sm">
+                            <i class="bi bi-plus-circle"></i> Add Review
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.Reviews != null && ((IEnumerable<BookReviewApp.Domain.Models.Review>)ViewBag.Reviews).Any())
+                    {
+                        foreach (var review in (IEnumerable<BookReviewApp.Domain.Models.Review>)ViewBag.Reviews)
+                        {
+                            <div class="border-bottom pb-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1">@(review.User?.Username ?? "Anonymous")</h6>
+                                        <div class="text-warning mb-2">
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                if (i <= review.Rating)
+                                                {
+                                                    <i class="bi bi-star-fill"></i>
+                                                }
+                                                else
+                                                {
+                                                    <i class="bi bi-star"></i>
+                                                }
+                                            }
+                                            <span class="text-muted ms-2">@review.Rating/5</span>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <small class="text-muted">@review.ReviewDate.ToString("MMM d, yyyy")</small>
+                                        <div class="btn-group btn-group-sm">
+                                            <a asp-action="Edit" asp-controller="Reviews" asp-route-id="@review.ReviewId" 
+                                               class="btn btn-outline-primary btn-sm">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a asp-action="Delete" asp-controller="Reviews" asp-route-id="@review.ReviewId" 
+                                               class="btn btn-outline-danger btn-sm">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                @if (!string.IsNullOrEmpty(review.Comment))
+                                {
+                                    <p class="mb-0">@review.Comment</p>
+                                }
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted py-4">
+                            <i class="bi bi-chat-dots" style="font-size: 3rem;"></i>
+                            <p class="mt-2">No reviews yet. Be the first to review this book!</p>
+                            <a asp-action="Create" asp-controller="Reviews" asp-route-bookId="@Model.BookId" 
+                               class="btn btn-primary">
+                                <i class="bi bi-plus-circle"></i> Add First Review
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle"></i> Book Details
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <strong>Added:</strong> @Model.CreatedAt.ToString("MMM d, yyyy")
+                        </li>
+                        @if (Model.UpdatedAt.HasValue)
+                        {
+                            <li class="mb-2">
+                                <strong>Updated:</strong> @Model.UpdatedAt.Value.ToString("MMM d, yyyy")
+                            </li>
+                        }
+                        <li class="mb-2">
+                            <strong>Reviews:</strong> @(((IEnumerable<BookReviewApp.Domain.Models.Review>)ViewBag.Reviews)?.Count() ?? 0)
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            @if (Model.Author != null)
+            {
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-person"></i> About the Author
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <h6>@Model.Author.Name</h6>
+                        @if (!string.IsNullOrEmpty(Model.Author.Biography))
+                        {
+                            <p class="small text-muted">@Model.Author.Biography</p>
+                        }
+                        @if (Model.Author.DateOfBirth != default)
+                        {
+                            <p class="small text-muted">
+                                <strong>Born:</strong> @Model.Author.DateOfBirth.ToString("MMMM d, yyyy")
+                            </p>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

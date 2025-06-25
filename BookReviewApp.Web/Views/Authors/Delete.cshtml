@@ -1,0 +1,79 @@
+@model BookReviewApp.Domain.Models.Author
+
+@{
+    ViewData["Title"] = "Delete Author";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="mb-0">
+                        <i class="bi bi-exclamation-triangle text-danger"></i> Delete Author
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <h5 class="alert-heading">Are you sure you want to delete this author?</h5>
+                        <p class="mb-0">This action cannot be undone.</p>
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <img src="@(Model.PhotoUrl ?? "/images/no-author-photo.png")" 
+                                         class="img-fluid rounded" 
+                                         alt="Photo of @Model.Name"
+                                         onerror="this.src='/images/no-author-photo.png'" />
+                                </div>
+                                <div class="col-md-9">
+                                    <h5>@Model.Name</h5>
+                                    @if (Model.DateOfBirth != default)
+                                    {
+                                        <p class="text-muted small">
+                                            <i class="bi bi-calendar"></i> Born: @Model.DateOfBirth.ToString("MMMM d, yyyy")
+                                        </p>
+                                    }
+                                    @if (!string.IsNullOrEmpty(Model.Biography))
+                                    {
+                                        <p class="small">@(Model.Biography.Length > 150 ? Model.Biography.Substring(0, 150) + "..." : Model.Biography)</p>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (ViewBag.Books != null && ((IEnumerable<BookReviewApp.Domain.Models.Book>)ViewBag.Books).Any())
+                    {
+                        <div class="alert alert-danger">
+                            <h6 class="alert-heading">
+                                <i class="bi bi-exclamation-triangle"></i> Warning: This author has books!
+                            </h6>
+                            <p class="mb-2">Deleting this author will also delete all associated books:</p>
+                            <ul class="mb-0">
+                                @foreach (var book in (IEnumerable<BookReviewApp.Domain.Models.Book>)ViewBag.Books)
+                                {
+                                    <li>@book.Title</li>
+                                }
+                            </ul>
+                        </div>
+                    }
+
+                    <form asp-action="Delete" method="post">
+                        <input type="hidden" asp-for="AuthorId" />
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Back to List
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash"></i> Delete Author
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

@@ -1,0 +1,113 @@
+@model BookReviewApp.Domain.Models.Book
+
+@{
+    ViewData["Title"] = "Edit Book";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="mb-0">
+                        <i class="bi bi-pencil-square"></i> Edit Book
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="BookId" />
+                        
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label asp-for="Title" class="form-label">Title</label>
+                                    <input asp-for="Title" class="form-control" placeholder="Enter the full title of the book" />
+                                    <span asp-validation-for="Title" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="AuthorId" class="form-label">Author</label>
+                                    <select asp-for="AuthorId" class="form-select" asp-items="@(new SelectList(ViewBag.Authors, "AuthorId", "Name"))">
+                                        <option value="">-- Select Author --</option>
+                                    </select>
+                                    <span asp-validation-for="AuthorId" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="Description" class="form-label">Description</label>
+                                    <textarea asp-for="Description" class="form-control" rows="4" 
+                                              placeholder="Enter a compelling description of the book"></textarea>
+                                    <span asp-validation-for="Description" class="text-danger"></span>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label asp-for="ISBN" class="form-label">ISBN</label>
+                                            <input asp-for="ISBN" class="form-control" placeholder="Enter 13-digit ISBN" />
+                                            <span asp-validation-for="ISBN" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label asp-for="PublishedDate" class="form-label">Published Date</label>
+                                            <input asp-for="PublishedDate" class="form-control" type="date" />
+                                            <span asp-validation-for="PublishedDate" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label asp-for="Price" class="form-label">Price</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">$</span>
+                                                <input asp-for="Price" class="form-control" type="number" step="0.01" min="0" />
+                                            </div>
+                                            <span asp-validation-for="Price" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label asp-for="CoverImageUrl" class="form-label">Cover Image URL</label>
+                                            <input asp-for="CoverImageUrl" class="form-control" placeholder="Enter URL for book cover" />
+                                            <span asp-validation-for="CoverImageUrl" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Current Cover</label>
+                                    <div class="text-center">
+                                        <img src="@(Model.CoverImageUrl ?? "/images/no-cover.png")" 
+                                             class="img-thumbnail" 
+                                             style="max-width: 200px;"
+                                             alt="Book Cover"
+                                             onerror="this.src='/images/no-cover.png'" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Back to List
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+} 

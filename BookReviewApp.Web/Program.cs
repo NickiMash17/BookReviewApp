@@ -13,20 +13,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        sqlServerOptions =>
-        {
-            sqlServerOptions.EnableRetryOnFailure(
-                maxRetryCount: 5,
-                maxRetryDelay: TimeSpan.FromSeconds(30),
-                errorNumbersToAdd: null);
-        }
-    ));
+    options.UseSqlite(
+        builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Register Repository and Service
+// Register Repository and Services
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<IAuthorService, AuthorService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
@@ -90,7 +85,7 @@ else
         logger.LogInformation("Connection string requested");
         return Results.Json(new { 
             Connection = connection,
-            Provider = "SQL Server"
+            Provider = "SQLite"
         });
     }).WithTags("Debug");
 }

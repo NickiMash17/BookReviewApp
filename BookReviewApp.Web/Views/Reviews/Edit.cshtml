@@ -1,0 +1,90 @@
+@model BookReviewApp.Domain.Models.Review
+
+@{
+    ViewData["Title"] = "Edit Review";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="mb-0">
+                        <i class="bi bi-pencil"></i> Edit Review
+                    </h2>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.Book != null)
+                    {
+                        <div class="alert alert-info">
+                            <h5 class="alert-heading">Reviewing: @ViewBag.Book.Title</h5>
+                            <p class="mb-0">by @(ViewBag.Book.Author?.Name ?? "Unknown Author")</p>
+                        </div>
+                    }
+
+                    <form asp-action="Edit" method="post">
+                        <input type="hidden" asp-for="ReviewId" />
+                        <input type="hidden" asp-for="BookId" />
+                        <input type="hidden" asp-for="UserId" />
+                        <input type="hidden" asp-for="ReviewDate" />
+                        
+                        <div class="mb-3">
+                            <label asp-for="Rating" class="form-label">Rating</label>
+                            <div class="rating-input">
+                                @for (int i = 5; i >= 1; i--)
+                                {
+                                    <input type="radio" asp-for="Rating" value="@i" id="rating-@i" class="btn-check" />
+                                    <label for="rating-@i" class="btn btn-outline-warning">
+                                        <i class="bi bi-star"></i> @i
+                                    </label>
+                                }
+                            </div>
+                            <span asp-validation-for="Rating" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Comment" class="form-label">Comment (Optional)</label>
+                            <textarea asp-for="Comment" class="form-control" rows="4" 
+                                      placeholder="Share your thoughts about this book..."></textarea>
+                            <span asp-validation-for="Comment" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Details" asp-controller="Books" asp-route-id="@Model.BookId" 
+                               class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Back to Book
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Update Review
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .rating-input {
+        display: flex;
+        gap: 0.5rem;
+        flex-direction: row-reverse;
+    }
+    
+    .rating-input .btn-check:checked + .btn {
+        background-color: #ffc107;
+        border-color: #ffc107;
+        color: #000;
+    }
+    
+    .rating-input .btn:hover {
+        background-color: #ffc107;
+        border-color: #ffc107;
+        color: #000;
+    }
+</style>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+} 

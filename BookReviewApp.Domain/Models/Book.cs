@@ -32,5 +32,6 @@ namespace BookReviewApp.Domain.Models
         
         public Author Author { get; set; } = null!;
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
+        public ICollection<BookCategory> BookCategories { get; set; } = new List<BookCategory>();
     }
 }

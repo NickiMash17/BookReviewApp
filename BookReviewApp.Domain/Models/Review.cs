@@ -20,9 +20,12 @@ namespace BookReviewApp.Domain.Models
         public Book Book { get; set; } = null!;
         
         [Required]
-        [StringLength(100)]
-        public string ReviewerName { get; set; } = null!;
+        public int UserId { get; set; }
+        
+        public User User { get; set; } = null!;
         
         public DateTime ReviewDate { get; set; } = DateTime.Now;
+        
+        public bool IsApproved { get; set; } = true;
     }
 }

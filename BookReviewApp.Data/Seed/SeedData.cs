@@ -49,7 +49,7 @@ namespace BookReviewApp.Data.Seed
                     Name = "George Orwell",
                     Biography = "English novelist and essayist, born Eric Arthur Blair, known for his dystopian novel '1984' and allegorical novella 'Animal Farm'.",
                     DateOfBirth = new DateTime(1903, 6, 25),
-                    PhotoUrl = $"{AuthorImagePath}/orwell.jpg",
+                    PhotoUrl = "https://randomuser.me/api/portraits/men/32.jpg",
                     CreatedAt = DateTime.UtcNow
                 },
                 new Author
@@ -57,7 +57,7 @@ namespace BookReviewApp.Data.Seed
                     Name = "J.R.R. Tolkien",
                     Biography = "English writer, poet, and philologist, best known for his high fantasy works 'The Hobbit' and 'The Lord of the Rings'.",
                     DateOfBirth = new DateTime(1892, 1, 3),
-                    PhotoUrl = $"{AuthorImagePath}/tolkien.jpg",
+                    PhotoUrl = "https://randomuser.me/api/portraits/men/45.jpg",
                     CreatedAt = DateTime.UtcNow
                 }
             };
@@ -76,7 +76,7 @@ namespace BookReviewApp.Data.Seed
                     ISBN = "978-0451524935",
                     PublishedDate = new DateTime(1949, 6, 8),
                     Price = 9.99m,
-                    CoverImageUrl = $"{CoverImagePath}/1984.jpg",
+                    CoverImageUrl = "https://covers.openlibrary.org/b/id/10523338-L.jpg",
                     AuthorId = authors[0].AuthorId,
                     CreatedAt = DateTime.UtcNow
                 },
@@ -87,7 +87,7 @@ namespace BookReviewApp.Data.Seed
                     ISBN = "978-0451526342",
                     PublishedDate = new DateTime(1945, 8, 17),
                     Price = 8.99m,
-                    CoverImageUrl = $"{CoverImagePath}/animal-farm.jpg",
+                    CoverImageUrl = "https://covers.openlibrary.org/b/id/11153227-L.jpg",
                     AuthorId = authors[0].AuthorId,
                     CreatedAt = DateTime.UtcNow
                 },
@@ -99,7 +99,7 @@ namespace BookReviewApp.Data.Seed
                     ISBN = "978-0547928227",
                     PublishedDate = new DateTime(1937, 9, 21),
                     Price = 12.99m,
-                    CoverImageUrl = $"{CoverImagePath}/hobbit.jpg",
+                    CoverImageUrl = "https://covers.openlibrary.org/b/id/10958330-L.jpg",
                     AuthorId = authors[1].AuthorId,
                     CreatedAt = DateTime.UtcNow
                 },
@@ -110,7 +110,7 @@ namespace BookReviewApp.Data.Seed
                     ISBN = "978-0547928210",
                     PublishedDate = new DateTime(1954, 7, 29),
                     Price = 14.99m,
-                    CoverImageUrl = $"{CoverImagePath}/fellowship.jpg",
+                    CoverImageUrl = "https://covers.openlibrary.org/b/id/8231856-L.jpg",
                     AuthorId = authors[1].AuthorId,
                     CreatedAt = DateTime.UtcNow
                 }

@@ -1,8 +1,330 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model dynamic
+
+@{
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<!-- Hero Section -->
+<div class="hero-section text-white text-center py-5 mb-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8 mx-auto">
+                <h1 class="display-4 fw-bold mb-4">
+                    <i class="bi bi-book-half text-warning"></i> 
+                    Discover Your Next Great Read
+                </h1>
+                <p class="lead mb-4">
+                    Join thousands of readers in discovering, reviewing, and sharing the best books across all genres. 
+                    From timeless classics to contemporary masterpieces, find your perfect book match.
+                </p>
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <a asp-controller="Books" asp-action="Index" class="btn btn-warning btn-lg">
+                        <i class="bi bi-search"></i> Browse Books
+                    </a>
+                    <a asp-controller="Books" asp-action="Create" class="btn btn-outline-light btn-lg">
+                        <i class="bi bi-plus-circle"></i> Add Book
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Statistics Section -->
+<div class="container mb-5">
+    <div class="row text-center">
+        <div class="col-md-3 mb-4">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="bi bi-book text-primary"></i>
+                </div>
+                <h3 class="stat-number">@ViewBag.TotalBooks</h3>
+                <p class="stat-label">Books in Library</p>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="bi bi-people text-success"></i>
+                </div>
+                <h3 class="stat-number">@ViewBag.TotalAuthors</h3>
+                <p class="stat-label">Authors</p>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="bi bi-star text-warning"></i>
+                </div>
+                <h3 class="stat-number">@ViewBag.TotalReviews</h3>
+                <p class="stat-label">Reviews</p>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="bi bi-heart text-danger"></i>
+                </div>
+                <h3 class="stat-number">@ViewBag.AverageRating</h3>
+                <p class="stat-label">Avg Rating</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Featured Books Section -->
+<div class="container mb-5">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="section-title text-center mb-4">
+                <i class="bi bi-star-fill text-warning"></i> Featured Books
+            </h2>
+        </div>
+    </div>
+    <div class="row">
+        @if (ViewBag.FeaturedBooks != null)
+        {
+            @foreach (var book in ViewBag.FeaturedBooks)
+            {
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="book-card h-100">
+                        <div class="book-cover">
+                            <img src="@(book.CoverImageUrl ?? "/images/no-cover.png")" 
+                                 class="img-fluid" 
+                                 alt="@book.Title"
+                                 onerror="this.src='/images/no-cover.png'" />
+                            <div class="book-overlay">
+                                <a asp-controller="Books" asp-action="Details" asp-route-id="@book.BookId" 
+                                   class="btn btn-warning btn-sm">
+                                    <i class="bi bi-eye"></i> View Details
+                                </a>
+                            </div>
+                        </div>
+                        <div class="book-info p-3">
+                            <h5 class="book-title">@book.Title</h5>
+                            <p class="book-author text-muted">
+                                <i class="bi bi-person"></i> @(book.Author?.Name ?? "Unknown")
+                            </p>
+                            <div class="book-rating">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                }
+                                <span class="ms-2 text-muted">@book.PublishedDate.ToString("yyyy")</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<!-- Categories Section -->
+<div class="container mb-5">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="section-title text-center mb-4">
+                <i class="bi bi-collection text-primary"></i> Popular Categories
+            </h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="category-card text-center p-4">
+                <div class="category-icon mb-3">
+                    <i class="bi bi-book text-primary"></i>
+                </div>
+                <h4>Fiction</h4>
+                <p class="text-muted">Explore imaginative worlds and compelling stories</p>
+                <a href="#" class="btn btn-outline-primary">Browse Fiction</a>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="category-card text-center p-4">
+                <div class="category-icon mb-3">
+                    <i class="bi bi-lightbulb text-success"></i>
+                </div>
+                <h4>Non-Fiction</h4>
+                <p class="text-muted">Discover knowledge and real-world insights</p>
+                <a href="#" class="btn btn-outline-success">Browse Non-Fiction</a>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="category-card text-center p-4">
+                <div class="category-icon mb-3">
+                    <i class="bi bi-heart text-danger"></i>
+                </div>
+                <h4>Romance</h4>
+                <p class="text-muted">Fall in love with captivating love stories</p>
+                <a href="#" class="btn btn-outline-danger">Browse Romance</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Call to Action -->
+<div class="cta-section text-white text-center py-5 mb-5">
+    <div class="container">
+        <h2 class="mb-4">Ready to Start Your Reading Journey?</h2>
+        <p class="lead mb-4">Join our community of book lovers and start reviewing your favorite books today.</p>
+        <a asp-controller="Books" asp-action="Create" class="btn btn-warning btn-lg">
+            <i class="bi bi-plus-circle"></i> Add Your First Book
+        </a>
+    </div>
+</div>
+
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        pointer-events: none;
+    }
+    
+    .hero-section > .container {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .stat-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+        color: #666;
+        font-size: 1.1rem;
+        margin: 0;
+    }
+    
+    .section-title {
+        font-weight: bold;
+        color: #333;
+        position: relative;
+        padding-bottom: 1rem;
+    }
+    
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        border-radius: 2px;
+    }
+    
+    .book-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .book-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+    }
+    
+    .book-cover {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .book-cover img {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    
+    .book-card:hover .book-cover img {
+        transform: scale(1.05);
+    }
+    
+    .book-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .book-card:hover .book-overlay {
+        opacity: 1;
+    }
+    
+    .book-title {
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        color: #333;
+    }
+    
+    .book-author {
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .book-rating {
+        font-size: 0.8rem;
+    }
+    
+    .category-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+    
+    .category-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .category-icon {
+        font-size: 3rem;
+    }
+    
+    .cta-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
+    }
+</style>
