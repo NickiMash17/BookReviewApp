@@ -1,3 +1,7 @@
+//
+// This file and all code in this project are the original work of Nicolette Mashaba (nickimash).
+// All rights reserved. Do not copy or redistribute without permission.
+//
 using BookReviewApp.Services.Interfaces;
 using BookReviewApp.Domain.Models;
 using BookReviewApp.Web.Models;

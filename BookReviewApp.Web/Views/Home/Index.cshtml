@@ -1,4 +1,8 @@
-﻿@model dynamic
+﻿@* 
+    This file and all UI/UX, code, and design in this project are the original work of Nicolette Mashaba (nickimash).
+    All rights reserved. Do not copy or redistribute without permission.
+*@
+@model dynamic
 
 @{
     ViewData["Title"] = "Home";
@@ -89,8 +93,8 @@
                 <div class="col-lg-3 col-md-6 mb-4">
                     <div class="book-card h-100">
                         <div class="book-cover">
-                            <img src="@(book.CoverImageUrl ?? "/images/no-cover.png")" 
-                                 class="img-fluid" 
+                            <img src="@((book.Title == "American Gods" || book.Title == "Harry Potter and the Prisoner of Azkaban") ? "/images/no-cover.png" : (book.CoverImageUrl ?? "/images/no-cover.png"))"
+                                 class="img-fluid"
                                  alt="@book.Title"
                                  onerror="this.src='/images/no-cover.png'" />
                             <div class="book-overlay">

@@ -43,7 +43,7 @@
 </div>
 
 <!-- Books Grid -->
-<div class="container">
+<div class="container book-list">
     @if (Model.Any())
     {
         <div class="row" id="booksGrid">
@@ -55,10 +55,11 @@
                      data-description="@(book.Description?.ToLower() ?? "")">
                     <div class="book-card h-100">
                         <div class="book-cover-wrapper">
-                            <img src="@(book.CoverImageUrl ?? "/images/default-book.png")"
-                                 class="img-fluid book-cover"
-                                 alt="@book.Title"
-                                 onerror="this.src='/images/default-book.png'" />
+                            <img src="@(string.IsNullOrEmpty(book.CoverImageUrl) ? "/images/placeholder.jpg" : book.CoverImageUrl)"
+                                 class="img-fluid book-cover fade-in"
+                                 alt="@book.Title cover"
+                                 loading="lazy"
+                                 onerror="this.onerror=null;this.src='/images/placeholder.jpg';" />
                             <div class="book-overlay">
                                 <div class="overlay-buttons">
                                     <a asp-action="Details" asp-route-id="@book.BookId" 

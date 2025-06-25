@@ -1,6 +1,71 @@
-﻿@{
+﻿@* 
+    This file and all UI/UX, code, and design in this project are the original work of Nicolette Mashaba (nickimash).
+    All rights reserved. Do not copy or redistribute without permission.
+*@
+@{
     ViewData["Title"] = "Privacy Policy";
 }
-<h1>@ViewData["Title"]</h1>
+<style>
+    body.privacy-bg {
+        background: linear-gradient(135deg, #e0e7ff 0%, #f8fafc 100%) !important;
+    }
+    .privacy-card {
+        animation: fadeInUp 1s cubic-bezier(0.23, 1, 0.32, 1);
+        box-shadow: 0 8px 32px rgba(102,126,234,0.12);
+        border: none;
+        border-radius: 18px;
+    }
+    .privacy-icon {
+        font-size: 2.5rem;
+        color: #667eea;
+        margin-bottom: 0.5rem;
+    }
+    .privacy-quote {
+        background: linear-gradient(90deg, #667eea11, #764ba211);
+        border-left: 4px solid #667eea;
+        font-style: italic;
+        color: #444;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+    }
+    @@keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(40px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.body.classList.add('privacy-bg');
+    });
+</script>
+<h1 class="mb-4"><span class="privacy-icon"><i class="bi bi-shield-lock"></i></span> @ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<div class="card privacy-card shadow-sm mb-5" style="max-width: 700px; margin: 2rem auto;">
+    <div class="card-body">
+        <div class="privacy-quote mb-4">
+            <i class="bi bi-quote"></i> "Privacy is not an option, and it shouldn't be the price we accept for just getting on the Internet." <span class="text-muted">– Gary Kovacs</span>
+        </div>
+        <h3 class="card-title mb-3">Your Privacy Matters</h3>
+        <p class="mb-3">This Book Review App is committed to protecting your privacy. We only collect the minimum information necessary to provide a great experience. Your data is never sold or shared with third parties except as required by law.</p>
+        <ul class="mb-3">
+            <li><strong>Data Collection:</strong> We collect only what you provide (e.g., reviews, ratings, and account info if you register).</li>
+            <li><strong>Cookies:</strong> We use cookies for session management and to enhance your experience. No tracking or advertising cookies are used.</li>
+            <li><strong>Security:</strong> All data is stored securely and access is restricted to authorized personnel only.</li>
+            <li><strong>Third-Party Links:</strong> This app may link to external sites. We are not responsible for their content or privacy practices.</li>
+        </ul>
+        <p class="mb-4">By using this app, you agree to this privacy policy. For questions or concerns, please contact the developer below.</p>
+        <hr />
+        <div class="text-center mt-4">
+            <h4 class="mb-2">About the Developer</h4>
+            <p class="mb-1"><strong>Nicolette Mashaba</strong> <span class="badge bg-primary">Full Stack Developer</span></p>
+            <p class="text-muted mb-3">Building digital experiences that matter. <a href="https://nickimash.vercel.app/" target="_blank">View Portfolio</a></p>
+            <div class="d-flex justify-content-center gap-3 mb-2">
+                <a href="mailto:nene171408@gmail.com" class="btn btn-outline-primary btn-sm" title="Email"><i class="bi bi-envelope"></i> Email</a>
+                <a href="https://www.linkedin.com/in/nicolette-mashaba-b094a5221" target="_blank" class="btn btn-outline-info btn-sm" title="LinkedIn"><i class="bi bi-linkedin"></i> LinkedIn</a>
+                <a href="https://nickimash.vercel.app/" target="_blank" class="btn btn-outline-dark btn-sm" title="Portfolio"><i class="bi bi-globe2"></i> Portfolio</a>
+            </div>
+            <div class="small text-muted">Polokwane, South Africa</div>
+        </div>
+    </div>
+</div>

@@ -1,3 +1,7 @@
+//
+// This file and all code in this project are the original work of Nicolette Mashaba (nickimash).
+// All rights reserved. Do not copy or redistribute without permission.
+//
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 

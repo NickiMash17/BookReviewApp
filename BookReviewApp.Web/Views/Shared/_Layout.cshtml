@@ -1,47 +1,66 @@
-﻿<!DOCTYPE html>
+﻿<!--
+    This file and all UI/UX, code, and design in this project are the original work of Nicolette Mashaba (nickimash).
+    All rights reserved. Do not copy or redistribute without permission.
+-->
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Book Review App</title>
+    <link rel="icon" type="image/x-icon" href="~/favicon.ico" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/BookReviewApp.Web.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     @await RenderSectionAsync("Styles", required: false)
+    <style>
+        body { background: #f8f9fa; }
+        .navbar-brand img { height: 40px; margin-right: 10px; }
+        .navbar { box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .footer {
+            background: #222; color: #fff; padding: 1.5rem 0; font-size: 1rem;
+        }
+        .footer a { color: #ffc107; text-decoration: none; margin: 0 0.5rem; }
+        .footer a:hover { color: #fff; text-decoration: underline; }
+        .footer .social-icons i { font-size: 1.3rem; margin: 0 0.3rem; }
+    </style>
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-controller="Home" asp-action="Index">Book Review App</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
+        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom sticky-top" aria-label="Main navigation">
+            <div class="container">
+                <a class="navbar-brand d-flex align-items-center" asp-controller="Home" asp-action="Index">
+                    <img src="/images/placeholder.jpg" alt="Book Review App Logo" />
+                    <span class="fw-bold">Book Review App</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                <div class="collapse navbar-collapse" id="mainNavbar">
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">
+                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Index" aria-label="Home">
                                 <i class="bi bi-house"></i> Home
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Dashboard" asp-action="Index">
+                            <a class="nav-link text-dark" asp-controller="Dashboard" asp-action="Index" aria-label="Dashboard">
                                 <i class="bi bi-graph-up"></i> Dashboard
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Books" asp-action="Index">
+                            <a class="nav-link text-dark" asp-controller="Books" asp-action="Index" aria-label="Books">
                                 <i class="bi bi-book"></i> Books
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Authors" asp-action="Index">
+                            <a class="nav-link text-dark" asp-controller="Authors" asp-action="Index" aria-label="Authors">
                                 <i class="bi bi-people"></i> Authors
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Privacy">
+                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Privacy" aria-label="Privacy">
                                 <i class="bi bi-shield"></i> Privacy
                             </a>
                         </li>
@@ -69,15 +88,16 @@
         @RenderBody()
     </main>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; @DateTime.Now.Year - Book Review App - <a asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
-
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
+    <div class="trademark-badge">
+        <span class="trademark-icon"><i class="bi bi-book"></i></span>
+        &copy; @DateTime.Now.Year Nicolette Mashaba™
+        <a href="https://www.linkedin.com/in/nicolette-mashaba-b094a5221" target="_blank" aria-label="LinkedIn" class="trademark-link"><i class="bi bi-linkedin"></i></a>
+        <a href="https://nickimash.vercel.app/" target="_blank" aria-label="Portfolio" class="trademark-link"><i class="bi bi-globe2"></i></a>
+        <a href="mailto:nene171408@gmail.com" aria-label="Email" class="trademark-link"><i class="bi bi-envelope"></i></a>
+    </div>
 </body>
 </html>

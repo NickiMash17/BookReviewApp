@@ -208,3 +208,46 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ⭐ **Star this repository if you found it helpful!**
 
 This project demonstrates modern web development practices, clean architecture, and professional UI/UX design. Perfect for showcasing full-stack development skills to potential employers.
+
+## Database Setup
+
+The official database initialization script for this project is [`setup_bookreviewdb.sql`](./setup_bookreviewdb.sql). This script:
+- Drops and recreates all tables in the correct order
+- Uses modern SQL Server syntax (`DROP TABLE IF EXISTS`, explicit foreign key constraints)
+- Supports Unicode data for international author/book names
+- Populates the database with sample data and provides useful queries
+
+The previous script, `BookReviewApp.sql`, has been archived for reference. **All new development and deployments should use `setup_bookreviewdb.sql`.**
+
+**Best Practices:**
+- Keep schema and data scripts clear, well-commented, and versioned
+- Use Unicode (`N'...'`) for all string data
+- Prefer explicit constraint names for maintainability
+- Archive old scripts for reference, but use a single canonical setup script for production
+
+## Switching Between SQLite and SQL Server
+
+By default, the app uses SQLite for easy local development. To use SQL Server (e.g., for production or advanced features):
+
+1. **Start SQL Server in Docker:**
+   ```bash
+   docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=YourStrong!Passw0rd' -p 1433:1433 -d mcr.microsoft.com/mssql/server:2019-latest
+   ```
+2. **Update the connection string in `BookReviewApp.Web/appsettings.json`:**
+   Replace the existing line with:
+   ```json
+   "DefaultConnection": "Server=localhost,1433;Database=BookReviewDB;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True;"
+   ```
+3. **Run EF Core migrations:**
+   ```bash
+   dotnet ef database update
+   ```
+
+**Tip:**
+- Use EF Core migrations to keep your schema in sync with your models.
+- Use the seeding logic in `SeedData.cs` to populate your database with sample data for development and testing.
+- For production, review and update your connection string and security settings as needed.
+
+---
+
+Developed with ❤️ by Nicolette Mashaba

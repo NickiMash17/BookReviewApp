@@ -1,3 +1,7 @@
+@* 
+    This file and all UI/UX, code, and design in this project are the original work of Nicolette Mashaba (nickimash).
+    All rights reserved. Do not copy or redistribute without permission.
+*@
 @{
     ViewData["Title"] = "Dashboard";
 }
@@ -126,7 +130,7 @@
                         {
                             <div class="content-item">
                                 <div class="content-item-image">
-                                    <img src="@(book.CoverImageUrl ?? "/images/no-cover.png")" 
+                                    <img src="@((book.Title == "American Gods" || book.Title == "Harry Potter and the Prisoner of Azkaban") ? "/images/no-cover.png" : (book.CoverImageUrl ?? "/images/no-cover.png"))"
                                          alt="@book.Title"
                                          onerror="this.src='/images/no-cover.png'" />
                                 </div>

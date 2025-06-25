@@ -42,7 +42,7 @@
 </div>
 
 <!-- Authors Grid -->
-<div class="container">
+<div class="container book-list">
     @if (Model.Any())
     {
         <div class="row" id="authorsGrid">
@@ -52,11 +52,12 @@
                      data-name="@author.Name.ToLower()" 
                      data-biography="@(author.Biography?.ToLower() ?? "")">
                     <div class="author-card h-100">
-                        <div class="author-photo-wrapper">
-                            <img src="@(author.PhotoUrl ?? "/images/default-author.png")" 
-                                 class="author-photo" 
+                        <div class="author-photo-wrapper d-flex justify-content-center align-items-center" style="height: 250px;">
+                            <img src="@(string.IsNullOrEmpty(author.PhotoUrl) ? "/images/placeholder.jpg" : author.PhotoUrl)" 
+                                 class="author-photo fade-in" 
                                  alt="Photo of @author.Name"
-                                 onerror="this.src='/images/default-author.png'" />
+                                 loading="lazy"
+                                 onerror="this.onerror=null;this.src='/images/placeholder.jpg';" />
                             <div class="author-overlay">
                                 <div class="overlay-buttons">
                                     <a asp-action="Details" asp-route-id="@author.AuthorId" 

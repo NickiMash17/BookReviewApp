@@ -1,3 +1,7 @@
+//
+// This file and all code in this project are the original work of Nicolette Mashaba (nickimash).
+// All rights reserved. Do not copy or redistribute without permission.
+//
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using BookReviewApp.Web.Models;
