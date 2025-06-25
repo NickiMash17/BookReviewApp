@@ -64,6 +64,40 @@
                                 <i class="bi bi-shield"></i> Privacy
                             </a>
                         </li>
+                        @if (User.Identity?.IsAuthenticated ?? false)
+                        {
+                            var avatarUrl = "/images/placeholder.jpg";
+                            var picClaim = User.Claims.FirstOrDefault(c => c.Type == "ProfilePictureUrl")?.Value;
+                            if (!string.IsNullOrEmpty(picClaim)) {
+                                avatarUrl = picClaim;
+                            } else {
+                                var seed = User.Identity.Name ?? User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Email)?.Value ?? "user";
+                                avatarUrl = $"https://api.dicebear.com/7.x/identicon/svg?seed={Uri.EscapeDataString(seed)}";
+                            }
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-primary d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <img src="@avatarUrl" alt="Avatar" class="rounded-circle me-2" style="width:32px;height:32px;object-fit:cover;border:2px solid #e0e7ff;background:#f8f9fa;" />
+                                    <span>@User.Identity.Name</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile">Profile</a></li>
+                                    <li>
+                                        <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                            <button type="submit" class="dropdown-item">Logout</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Login"><i class="bi bi-box-arrow-in-right"></i> Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Register"><i class="bi bi-person-plus"></i> Register</a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>

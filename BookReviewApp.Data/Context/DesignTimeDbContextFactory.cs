@@ -9,7 +9,7 @@ namespace BookReviewApp.Data.Context
         public ApplicationDbContext CreateDbContext(string[] args)
         {
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-            optionsBuilder.UseSqlServer("Server=.\\SQLEXPRESS;Database=BookReviewApp;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True");
+            optionsBuilder.UseSqlite("Data Source=BookReviewApp.db");
             
             return new ApplicationDbContext(optionsBuilder.Options);
         }

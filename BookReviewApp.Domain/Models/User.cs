@@ -33,6 +33,9 @@ namespace BookReviewApp.Domain.Models
         
         public DateTime? LastLoginDate { get; set; }
         
+        [StringLength(200)]
+        public string? ProfilePictureUrl { get; set; }
+        
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
     }
 } 

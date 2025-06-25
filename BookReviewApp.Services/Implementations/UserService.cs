@@ -5,14 +5,14 @@
 using BookReviewApp.Domain.Interfaces;
 using BookReviewApp.Domain.Models;
 using BookReviewApp.Services.Interfaces;
-using System.Security.Cryptography;
-using System.Text;
+using Microsoft.AspNetCore.Identity;
 
 namespace BookReviewApp.Services.Implementations
 {
     public class UserService : IUserService
     {
         private readonly IRepository<User> _userRepository;
+        private readonly PasswordHasher<User> _passwordHasher = new PasswordHasher<User>();
 
         public UserService(IRepository<User> userRepository)
         {
@@ -45,8 +45,8 @@ namespace BookReviewApp.Services.Implementations
 
         public async Task<User> AddUserAsync(User user)
         {
-            // Hash the password before saving
-            user.PasswordHash = HashPassword(user.PasswordHash);
+            // Hash the password before saving using PasswordHasher
+            user.PasswordHash = _passwordHasher.HashPassword(user, user.PasswordHash);
             await _userRepository.AddAsync(user);
             return user;
         }
@@ -82,8 +82,8 @@ namespace BookReviewApp.Services.Implementations
             if (user == null || !user.IsActive)
                 return false;
 
-            var hashedPassword = HashPassword(password);
-            return user.PasswordHash == hashedPassword;
+            var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, password);
+            return result == PasswordVerificationResult.Success;
         }
 
         public async Task UpdateLastLoginAsync(int userId)
@@ -94,13 +94,6 @@ namespace BookReviewApp.Services.Implementations
                 user.LastLoginDate = DateTime.Now;
                 await _userRepository.UpdateAsync(user);
             }
-        }
-
-        private static string HashPassword(string password)
-        {
-            using var sha256 = SHA256.Create();
-            var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-            return Convert.ToBase64String(hashedBytes);
         }
     }
 } 
