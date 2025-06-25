@@ -19,7 +19,7 @@
                         <div class="col-md-4">
                             <img src="@(Model.CoverImageUrl ?? "/images/no-cover.png")" 
                                  class="img-fluid rounded" 
-                                 alt="Cover of @Model.Title"
+                                 alt="Cover of @Model.Title by @Model.Author?.Name"
                                  onerror="this.src='/images/no-cover.png'" />
                         </div>
                         <div class="col-md-8">
@@ -46,13 +46,13 @@
                             </dl>
 
                             <div class="mt-3">
-                                <a asp-action="Edit" asp-route-id="@Model.BookId" class="btn btn-warning">
+                                <a asp-action="Edit" asp-route-id="@Model.BookId" class="btn btn-warning" aria-label="Edit @Model.Title">
                                     <i class="bi bi-pencil"></i> Edit
                                 </a>
-                                <a asp-action="Delete" asp-route-id="@Model.BookId" class="btn btn-danger">
+                                <a asp-action="Delete" asp-route-id="@Model.BookId" class="btn btn-danger" aria-label="Delete @Model.Title">
                                     <i class="bi bi-trash"></i> Delete
                                 </a>
-                                <a asp-action="Index" class="btn btn-secondary">
+                                <a asp-action="Index" class="btn btn-secondary" aria-label="Back to book list">
                                     <i class="bi bi-arrow-left"></i> Back to List
                                 </a>
                             </div>
@@ -108,11 +108,11 @@
                                         <small class="text-muted">@review.ReviewDate.ToString("MMM d, yyyy")</small>
                                         <div class="btn-group btn-group-sm">
                                             <a asp-action="Edit" asp-controller="Reviews" asp-route-id="@review.ReviewId" 
-                                               class="btn btn-outline-primary btn-sm">
+                                               class="btn btn-outline-primary btn-sm" aria-label="Edit review by @review.User?.Username">
                                                 <i class="bi bi-pencil"></i>
                                             </a>
                                             <a asp-action="Delete" asp-controller="Reviews" asp-route-id="@review.ReviewId" 
-                                               class="btn btn-outline-danger btn-sm">
+                                               class="btn btn-outline-danger btn-sm" aria-label="Delete review by @review.User?.Username">
                                                 <i class="bi bi-trash"></i>
                                             </a>
                                         </div>

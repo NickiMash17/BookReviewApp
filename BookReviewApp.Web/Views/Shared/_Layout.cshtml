@@ -74,6 +74,15 @@
                                 var seed = User.Identity.Name ?? User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Email)?.Value ?? "user";
                                 avatarUrl = $"https://api.dicebear.com/7.x/identicon/svg?seed={Uri.EscapeDataString(seed)}";
                             }
+                            // Admin Dashboard link for Admins only
+                            if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-danger fw-bold" asp-controller="Admin" asp-action="Index">
+                                        <i class="bi bi-shield-lock"></i> Admin Dashboard
+                                    </a>
+                                </li>
+                            }
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle text-primary d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <img src="@avatarUrl" alt="Avatar" class="rounded-circle me-2" style="width:32px;height:32px;object-fit:cover;border:2px solid #e0e7ff;background:#f8f9fa;" />
@@ -126,12 +135,12 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
-    <div class="trademark-badge">
-        <span class="trademark-icon"><i class="bi bi-book"></i></span>
-        &copy; @DateTime.Now.Year Nicolette Mashaba™
-        <a href="https://www.linkedin.com/in/nicolette-mashaba-b094a5221" target="_blank" aria-label="LinkedIn" class="trademark-link"><i class="bi bi-linkedin"></i></a>
-        <a href="https://nickimash.vercel.app/" target="_blank" aria-label="Portfolio" class="trademark-link"><i class="bi bi-globe2"></i></a>
-        <a href="mailto:nene171408@gmail.com" aria-label="Email" class="trademark-link"><i class="bi bi-envelope"></i></a>
-    </div>
 </body>
+<div class="trademark-badge">
+    <span class="trademark-icon"><i class="bi bi-book"></i></span>
+    &copy; @DateTime.Now.Year Nicolette Mashaba™
+    <a href="https://www.linkedin.com/in/nicolette-mashaba-b094a5221" target="_blank" aria-label="LinkedIn" class="trademark-link"><i class="bi bi-linkedin"></i></a>
+    <a href="https://nickimash.vercel.app/" target="_blank" aria-label="Portfolio" class="trademark-link"><i class="bi bi-globe2"></i></a>
+    <a href="mailto:nene171408@gmail.com" aria-label="Email" class="trademark-link"><i class="bi bi-envelope"></i></a>
+</div>
 </html>

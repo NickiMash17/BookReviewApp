@@ -4,47 +4,39 @@
     ViewData["Title"] = Model.Name;
 }
 
-<div class="container">
+<div class="container py-5">
     <div class="row">
         <!-- Author Information -->
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="mb-0">
-                        <i class="bi bi-person"></i> @Model.Name
-                    </h2>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <img src="@(Model.PhotoUrl ?? "/images/no-author-photo.png")" 
-                                 class="img-fluid rounded" 
-                                 alt="Photo of @Model.Name"
-                                 onerror="this.src='/images/no-author-photo.png'" />
-                        </div>
-                        <div class="col-md-8">
-                            <dl class="row">
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow-lg author-details-card mb-4">
+                <div class="row g-0">
+                    <div class="col-md-4 d-flex align-items-center justify-content-center p-3">
+                        <img src="@(Model.PhotoUrl ?? "/images/default-author.png")" class="img-fluid rounded-circle author-photo-lg" alt="Photo of @Model.Name" onerror="this.src='/images/default-author.png'" />
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h2 class="fw-bold mb-2">
+                                <i class="bi bi-person"></i> @Model.Name
+                            </h2>
+                            <div class="mb-2">
                                 @if (Model.DateOfBirth != default)
                                 {
-                                    <dt class="col-sm-4">Date of Birth</dt>
-                                    <dd class="col-sm-8">@Model.DateOfBirth.ToString("MMMM d, yyyy")</dd>
+                                    <span class="badge bg-secondary me-2"><i class="bi bi-cake"></i> @Model.DateOfBirth.ToString("MMMM d, yyyy")</span>
                                 }
-
-                                @if (!string.IsNullOrEmpty(Model.Biography))
-                                {
-                                    <dt class="col-sm-4">Biography</dt>
-                                    <dd class="col-sm-8">@Model.Biography</dd>
-                                }
-                            </dl>
-
-                            <div class="mt-3">
-                                <a asp-action="Edit" asp-route-id="@Model.AuthorId" class="btn btn-warning">
+                                <span class="badge bg-light text-dark"><i class="bi bi-book"></i> @(((IEnumerable<BookReviewApp.Domain.Models.Book>)ViewBag.Books)?.Count() ?? 0) Books</span>
+                            </div>
+                            @if (!string.IsNullOrEmpty(Model.Biography))
+                            {
+                                <p class="mt-3">@Model.Biography</p>
+                            }
+                            <div class="mt-4">
+                                <a asp-action="Edit" asp-route-id="@Model.AuthorId" class="btn btn-warning me-2" aria-label="Edit @Model.Name">
                                     <i class="bi bi-pencil"></i> Edit
                                 </a>
-                                <a asp-action="Delete" asp-route-id="@Model.AuthorId" class="btn btn-danger">
+                                <a asp-action="Delete" asp-route-id="@Model.AuthorId" class="btn btn-danger me-2" aria-label="Delete @Model.Name">
                                     <i class="bi bi-trash"></i> Delete
                                 </a>
-                                <a asp-action="Index" class="btn btn-secondary">
+                                <a asp-action="Index" class="btn btn-secondary" aria-label="Back to author list">
                                     <i class="bi bi-arrow-left"></i> Back to List
                                 </a>
                             </div>
@@ -52,9 +44,8 @@
                     </div>
                 </div>
             </div>
-
             <!-- Books Section -->
-            <div class="card mt-4">
+            <div class="card mt-4 shadow-sm">
                 <div class="card-header">
                     <h3 class="mb-0">
                         <i class="bi bi-book"></i> Books by @Model.Name
@@ -63,38 +54,31 @@
                 <div class="card-body">
                     @if (ViewBag.Books != null && ((IEnumerable<BookReviewApp.Domain.Models.Book>)ViewBag.Books).Any())
                     {
-                        <div class="row">
-                            @foreach (var book in (IEnumerable<BookReviewApp.Domain.Models.Book>)ViewBag.Books)
-                            {
-                                <div class="col-md-6 mb-3">
-                                    <div class="card h-100">
-                                        <div class="row g-0">
-                                            <div class="col-md-4">
-                                                <img src="@(book.CoverImageUrl ?? "/images/no-cover.png")" 
-                                                     class="img-fluid rounded-start h-100" 
-                                                     style="object-fit: cover;"
-                                                     alt="Cover of @book.Title"
-                                                     onerror="this.src='/images/no-cover.png'" />
-                                            </div>
-                                            <div class="col-md-8">
-                                                <div class="card-body">
-                                                    <h6 class="card-title">@book.Title</h6>
-                                                    <p class="card-text small text-muted">
-                                                        <i class="bi bi-calendar"></i> @book.PublishedDate.ToString("yyyy")
-                                                    </p>
-                                                    <p class="card-text small">
-                                                        <i class="bi bi-currency-dollar"></i> @book.Price.ToString("F2")
-                                                    </p>
-                                                    <a asp-action="Details" asp-controller="Books" asp-route-id="@book.BookId" 
-                                                       class="btn btn-primary btn-sm">
-                                                        <i class="bi bi-eye"></i> View Details
-                                                    </a>
+                        <div class="row g-4">
+                        @foreach (var book in (IEnumerable<BookReviewApp.Domain.Models.Book>)ViewBag.Books)
+                        {
+                            <div class="col-md-6">
+                                <div class="card book-card mb-3">
+                                    <div class="row g-0">
+                                        <div class="col-md-4 d-flex align-items-center justify-content-center p-2">
+                                            <img src="@(book.CoverImageUrl ?? "/images/no-cover.png")" class="img-fluid rounded book-cover-sm" alt="Cover of @book.Title" onerror="this.src='/images/no-cover.png'" />
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="card-body">
+                                                <h6 class="card-title fw-bold">@book.Title</h6>
+                                                <div class="mb-2">
+                                                    <span class="badge bg-secondary me-2"><i class="bi bi-calendar"></i> @book.PublishedDate.ToString("yyyy")</span>
+                                                    <span class="badge bg-info"><i class="bi bi-currency-dollar"></i> @book.Price.ToString("F2")</span>
                                                 </div>
+                                                <a asp-action="Details" asp-controller="Books" asp-route-id="@book.BookId" class="btn btn-primary btn-sm" aria-label="View details for @book.Title">
+                                                    <i class="bi bi-eye"></i> View Details
+                                                </a>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            }
+                            </div>
+                        }
                         </div>
                     }
                     else
@@ -107,10 +91,9 @@
                 </div>
             </div>
         </div>
-
         <!-- Sidebar -->
-        <div class="col-md-4">
-            <div class="card">
+        <div class="col-lg-4">
+            <div class="card mb-4">
                 <div class="card-header">
                     <h5 class="mb-0">
                         <i class="bi bi-info-circle"></i> Author Details
@@ -135,4 +118,35 @@
             </div>
         </div>
     </div>
-</div> 
+</div>
+<style>
+    .author-details-card {
+        border-radius: 22px;
+        transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .author-details-card:hover {
+        box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+        transform: translateY(-4px) scale(1.01);
+    }
+    .author-photo-lg {
+        width: 160px;
+        height: 160px;
+        object-fit: cover;
+        border-radius: 50%;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+    }
+    .book-card {
+        border-radius: 16px;
+        transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .book-card:hover {
+        box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+        transform: translateY(-2px) scale(1.01);
+    }
+    .book-cover-sm {
+        max-width: 100%;
+        max-height: 90px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    }
+</style> 

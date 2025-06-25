@@ -1,0 +1,14 @@
+@{
+    ViewData["Title"] = "Email Confirmation";
+}
+<div class="container mt-5" style="max-width: 500px;">
+    <div class="card shadow-sm">
+        <div class="card-body text-center">
+            <h2 class="mb-4">Email Confirmation</h2>
+            <div class="alert alert-info">
+                @ViewBag.Status
+            </div>
+            <a asp-action="Login" asp-controller="Account" class="btn btn-primary mt-3">Go to Login</a>
+        </div>
+    </div>
+</div> 

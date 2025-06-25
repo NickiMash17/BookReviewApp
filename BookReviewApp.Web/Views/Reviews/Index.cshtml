@@ -1,1 +1,81 @@
- 
+@model IEnumerable<BookReviewApp.Domain.Models.Review>
+@{
+    ViewData["Title"] = "All Reviews";
+}
+<div class="container py-5">
+    <h1 class="mb-4 text-center fw-bold">
+        <i class="bi bi-star-half text-warning"></i> All Reviews
+    </h1>
+    @if (Model.Any())
+    {
+        <div class="row g-4">
+            @foreach (var review in Model)
+            {
+                <div class="col-lg-6 col-xl-4">
+                    <div class="card shadow-sm h-100 review-card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <img src="@(review.User?.ProfilePictureUrl ?? "/images/placeholder.jpg")" class="rounded-circle me-3" style="width:48px;height:48px;object-fit:cover;" alt="Avatar of @review.User?.Username" />
+                                <div>
+                                    <h6 class="mb-0">@review.User?.Username</h6>
+                                    <small class="text-muted">@review.ReviewDate.ToString("MMM d, yyyy")</small>
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <span class="fw-bold">@review.Book?.Title</span>
+                                <span class="text-muted small">by @review.Book?.Author?.Name</span>
+                            </div>
+                            <div class="mb-2">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    if (i <= review.Rating)
+                                    {
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-star text-muted"></i>
+                                    }
+                                }
+                                <span class="ms-2 text-muted">@review.Rating/5</span>
+                            </div>
+                            @if (!string.IsNullOrEmpty(review.Comment))
+                            {
+                                <p class="mb-2">@review.Comment</p>
+                            }
+                            <div class="d-flex justify-content-end gap-2">
+                                @if (User.Identity?.IsAuthenticated == true && User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value == review.UserId.ToString())
+                                {
+                                    <a asp-action="Edit" asp-route-id="@review.ReviewId" class="btn btn-outline-primary btn-sm" aria-label="Edit review by @review.User?.Username">
+                                        <i class="bi bi-pencil"></i> Edit
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@review.ReviewId" class="btn btn-outline-danger btn-sm" aria-label="Delete review by @review.User?.Username">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="bi bi-star" style="font-size: 4rem; color: #6c757d;"></i>
+            <h2 class="mt-3 text-muted">No Reviews Found</h2>
+            <p class="text-muted">Be the first to review a book!</p>
+        </div>
+    }
+</div>
+<style>
+    .review-card {
+        border-radius: 18px;
+        transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .review-card:hover {
+        box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+        transform: translateY(-4px) scale(1.01);
+    }
+</style> 

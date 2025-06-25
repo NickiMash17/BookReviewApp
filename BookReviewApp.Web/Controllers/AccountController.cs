@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using System.IO;
+using System.Web;
+using System.Security.Cryptography;
+using System.Linq;
 
 namespace BookReviewApp.Web.Controllers
 {
@@ -51,8 +54,12 @@ namespace BookReviewApp.Web.Controllers
                 LastName = model.LastName
             };
             await _userService.AddUserAsync(user);
-            TempData["SuccessMessage"] = "Registration successful! Please log in.";
-            return RedirectToAction("Login", "Account");
+            // Generate confirmation link for demo
+            var token = GenerateEmailToken(user);
+            var url = Url.Action("ConfirmEmail", "Account", new { userId = user.UserId, token = token }, protocol: Request.Scheme);
+            ViewBag.ConfirmationUrl = url;
+            TempData["SuccessMessage"] = "Registration successful! Please confirm your email.";
+            return View("RegistrationSuccess");
         }
 
         [HttpGet]
@@ -73,6 +80,11 @@ namespace BookReviewApp.Web.Controllers
             if (user == null || !user.IsActive)
             {
                 ModelState.AddModelError("", "Invalid credentials or inactive account.");
+                return View(model);
+            }
+            if (!user.EmailConfirmed)
+            {
+                ModelState.AddModelError("", "Please confirm your email before logging in.");
                 return View(model);
             }
             var valid = await _userService.ValidateCredentialsAsync(user.Email, model.Password);
@@ -114,6 +126,9 @@ namespace BookReviewApp.Web.Controllers
                 Role = user.Role,
                 ProfilePictureUrl = user.ProfilePictureUrl
             };
+            // Fetch user's reviews
+            var reviews = user.Reviews?.OrderByDescending(r => r.ReviewDate).ToList() ?? new List<BookReviewApp.Domain.Models.Review>();
+            ViewBag.MyReviews = reviews;
             return View(model);
         }
 
@@ -272,6 +287,34 @@ namespace BookReviewApp.Web.Controllers
             await _userService.UpdateUserAsync(user);
             TempData["SuccessMessage"] = "Password reset successful! Please log in.";
             return RedirectToAction("Login");
+        }
+
+        [HttpGet]
+        public IActionResult ConfirmEmail(int userId, string token)
+        {
+            ViewBag.Status = "Invalid or expired confirmation link.";
+            // For demo: token is just a hash of userId + email
+            var user = _userService.GetUserByIdAsync(userId).Result;
+            if (user != null && !user.EmailConfirmed)
+            {
+                var expectedToken = GenerateEmailToken(user);
+                if (token == expectedToken)
+                {
+                    user.EmailConfirmed = true;
+                    _userService.UpdateUserAsync(user).Wait();
+                    ViewBag.Status = "Email confirmed! You can now log in.";
+                }
+            }
+            return View();
+        }
+
+        private string GenerateEmailToken(BookReviewApp.Domain.Models.User user)
+        {
+            // For demo: simple hash of userId + email
+            using var sha256 = SHA256.Create();
+            var input = $"{user.UserId}:{user.Email}";
+            var bytes = sha256.ComputeHash(System.Text.Encoding.UTF8.GetBytes(input));
+            return Convert.ToBase64String(bytes).Replace("/", "_").Replace("+", "-");
         }
 
         private async Task SignInUser(User user, bool rememberMe)

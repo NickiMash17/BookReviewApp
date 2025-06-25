@@ -30,6 +30,7 @@ namespace BookReviewApp.Domain.Models
         public string Role { get; set; } = "User"; // Admin, User
         
         public bool IsActive { get; set; } = true;
+        public bool EmailConfirmed { get; set; } = false;
         
         public DateTime? LastLoginDate { get; set; }
         

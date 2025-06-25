@@ -22,13 +22,13 @@
                     <input asp-for="RememberMe" class="form-check-input" />
                     <label asp-for="RememberMe" class="form-check-label"></label>
                 </div>
-                <button type="submit" class="btn btn-primary w-100">Login</button>
+                <button type="submit" class="btn btn-primary w-100" aria-label="Login to your account">Login</button>
             </form>
             <div class="mt-3 text-center">
-                <a asp-action="ForgotPassword" asp-controller="Account">Forgot Password?</a>
+                <a asp-action="ForgotPassword" asp-controller="Account" aria-label="Forgot your password?">Forgot Password?</a>
             </div>
             <div class="mt-3 text-center">
-                <span>Don't have an account?</span> <a asp-action="Register" asp-controller="Account">Register</a>
+                <span>Don't have an account?</span> <a asp-action="Register" asp-controller="Account" aria-label="Register a new account">Register</a>
             </div>
         </div>
     </div>

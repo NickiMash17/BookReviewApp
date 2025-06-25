@@ -1,0 +1,19 @@
+@{
+    ViewData["Title"] = "Registration Successful";
+}
+<div class="container mt-5" style="max-width: 500px;">
+    <div class="card shadow-sm">
+        <div class="card-body text-center">
+            <h2 class="mb-4">Registration Successful!</h2>
+            <p class="mb-3">Please check your email to confirm your account before logging in.</p>
+            @if (ViewBag.ConfirmationUrl != null)
+            {
+                <div class="alert alert-info">
+                    <strong>Demo:</strong> Click the link below to confirm your email.<br />
+                    <a href="@ViewBag.ConfirmationUrl" class="btn btn-success mt-2">Confirm Email</a>
+                </div>
+            }
+            <a asp-action="Login" asp-controller="Account" class="btn btn-primary mt-3">Back to Login</a>
+        </div>
+    </div>
+</div> 

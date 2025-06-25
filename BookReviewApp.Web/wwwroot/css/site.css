@@ -168,3 +168,104 @@ body {
 main.container {
     padding-bottom: 3.5rem;
 }
+
+/* --- Subtle Button and Card Animations --- */
+.btn, .btn-primary, .btn-outline-primary, .btn-outline-secondary, .btn-outline-success, .btn-outline-danger, .btn-outline-info, .btn-outline-warning, .btn-secondary, .btn-success, .btn-danger, .btn-info, .btn-warning {
+    transition: background 0.18s, color 0.18s, box-shadow 0.18s, transform 0.14s;
+    box-shadow: 0 2px 8px rgba(34,54,94,0.04);
+    will-change: transform, box-shadow;
+}
+.btn:hover, .btn:focus {
+    transform: translateY(-2px) scale(1.045);
+    box-shadow: 0 6px 24px rgba(34,54,94,0.13);
+    filter: brightness(1.04);
+    z-index: 2;
+}
+.btn:active {
+    transform: scale(0.97);
+    box-shadow: 0 2px 8px rgba(34,54,94,0.10);
+    filter: brightness(0.98);
+}
+.card, .book-card, .author-card, .review-card, .content-card, .chart-card, .privacy-card, .category-card {
+    transition: box-shadow 0.22s, transform 0.18s;
+    will-change: transform, box-shadow;
+}
+.card:hover, .book-card:hover, .author-card:hover, .review-card:hover, .content-card:hover, .chart-card:hover, .privacy-card:hover, .category-card:hover {
+    box-shadow: 0 12px 40px rgba(34,54,94,0.13), 0 2px 8px #00d2ff22;
+    transform: translateY(-4px) scale(1.012);
+    z-index: 1;
+}
+
+/* --- Glassmorphic Sticky Navbar --- */
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    background: rgba(255,255,255,0.92) !important;
+    backdrop-filter: blur(18px) saturate(1.2);
+    box-shadow: 0 4px 24px rgba(34,54,94,0.10);
+    border-bottom: 1.5px solid #e0e7ef;
+    border-radius: 0 0 18px 18px;
+    padding-top: 0.7rem;
+    padding-bottom: 0.7rem;
+    transition: box-shadow 0.22s, background 0.22s, border 0.22s;
+}
+@supports not (backdrop-filter: blur(24px)) {
+    .navbar {
+        background: rgba(255,255,255,0.96) !important;
+    }
+}
+.navbar-nav .nav-link {
+    position: relative;
+    padding: 0.7rem 1.2rem;
+    font-weight: 500;
+    color: #22365e;
+    transition: color 0.18s, background 0.18s;
+    border-radius: 8px;
+    z-index: 1;
+}
+.navbar-nav .nav-link:hover, .navbar-nav .nav-link:focus {
+    color: #0077cc;
+    background: #f3f7ff;
+}
+.navbar-nav .nav-link.active, .navbar-nav .nav-link[aria-current="page"] {
+    color: #22365e !important;
+    font-weight: 700;
+    background: #fff;
+    box-shadow: 0 2px 12px #667eea22;
+    position: relative;
+}
+.navbar-nav .nav-link.active::after, .navbar-nav .nav-link[aria-current="page"]::after {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 20%;
+    right: 20%;
+    bottom: 4px;
+    height: 5px;
+    border-radius: 2px;
+    background: #ffd700;
+    box-shadow: 0 0 4px #ffd70099;
+    opacity: 1;
+    transition: width 0.22s, background 0.18s;
+}
+@media (max-width: 991.98px) {
+    .navbar-nav .nav-link {
+        padding: 0.7rem 1rem;
+        margin-bottom: 0.3rem;
+    }
+    .navbar {
+        border-radius: 0;
+        box-shadow: 0 2px 8px rgba(34,54,94,0.09);
+    }
+}
+
+.btn:focus, .btn:focus-visible, .nav-link:focus, .nav-link:focus-visible {
+    outline: 2.5px solid #764ba2 !important;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 2px #ffd70055;
+    z-index: 2;
+}
+.btn, .action-buttons .btn {
+    cursor: pointer;
+}

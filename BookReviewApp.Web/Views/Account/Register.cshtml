@@ -38,10 +38,10 @@
                     <input asp-for="LastName" class="form-control" />
                     <span asp-validation-for="LastName" class="text-danger"></span>
                 </div>
-                <button type="submit" class="btn btn-primary w-100">Register</button>
+                <button type="submit" class="btn btn-primary w-100" aria-label="Register new account">Register</button>
             </form>
             <div class="mt-3 text-center">
-                <span>Already have an account?</span> <a asp-action="Login" asp-controller="Account">Login</a>
+                <span>Already have an account?</span> <a asp-action="Login" asp-controller="Account" aria-label="Go to login page">Login</a>
             </div>
         </div>
     </div>

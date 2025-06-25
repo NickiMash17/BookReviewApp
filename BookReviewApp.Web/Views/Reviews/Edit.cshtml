@@ -4,11 +4,11 @@
     ViewData["Title"] = "Edit Review";
 }
 
-<div class="container">
+<div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
                     <h2 class="mb-0">
                         <i class="bi bi-pencil"></i> Edit Review
                     </h2>
@@ -16,7 +16,7 @@
                 <div class="card-body">
                     @if (ViewBag.Book != null)
                     {
-                        <div class="alert alert-info">
+                        <div class="alert alert-info mb-4">
                             <h5 class="alert-heading">Reviewing: @ViewBag.Book.Title</h5>
                             <p class="mb-0">by @(ViewBag.Book.Author?.Name ?? "Unknown Author")</p>
                         </div>
@@ -29,7 +29,7 @@
                         <input type="hidden" asp-for="ReviewDate" />
                         
                         <div class="mb-3">
-                            <label asp-for="Rating" class="form-label">Rating</label>
+                            <label asp-for="Rating" class="form-label"><i class="bi bi-star-half"></i> Rating</label>
                             <div class="rating-input">
                                 @for (int i = 5; i >= 1; i--)
                                 {
@@ -43,7 +43,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="Comment" class="form-label">Comment (Optional)</label>
+                            <label asp-for="Comment" class="form-label"><i class="bi bi-chat-text"></i> Comment (Optional)</label>
                             <textarea asp-for="Comment" class="form-control" rows="4" 
                                       placeholder="Share your thoughts about this book..."></textarea>
                             <span asp-validation-for="Comment" class="text-danger"></span>
