@@ -93,10 +93,10 @@
                 <div class="col-lg-3 col-md-6 mb-4">
                     <div class="book-card h-100">
                         <div class="book-cover">
-                            <img src="@((book.Title == "American Gods" || book.Title == "Harry Potter and the Prisoner of Azkaban") ? "/images/no-cover.png" : (book.CoverImageUrl ?? "/images/no-cover.png"))"
+                            <img src="@(book.CoverImageUrl ?? "/images/placeholder.jpg")"
                                  class="img-fluid"
                                  alt="@book.Title"
-                                 onerror="this.src='/images/no-cover.png'" />
+                                 onerror="this.src='/images/placeholder.jpg'" />
                             <div class="book-overlay">
                                 <a asp-controller="Books" asp-action="Details" asp-route-id="@book.BookId" 
                                    class="btn btn-warning btn-sm">

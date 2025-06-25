@@ -17,10 +17,10 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-4">
-                            <img src="@(Model.CoverImageUrl ?? "/images/no-cover.png")" 
+                            <img src="@(Model.CoverImageUrl ?? "/images/placeholder.jpg")" 
                                  class="img-fluid rounded" 
                                  alt="Cover of @Model.Title by @Model.Author?.Name"
-                                 onerror="this.src='/images/no-cover.png'" />
+                                 onerror="this.src='/images/placeholder.jpg'" />
                         </div>
                         <div class="col-md-8">
                             <dl class="row">

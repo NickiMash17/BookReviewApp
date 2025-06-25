@@ -130,9 +130,9 @@
                         {
                             <div class="content-item">
                                 <div class="content-item-image">
-                                    <img src="@((book.Title == "American Gods" || book.Title == "Harry Potter and the Prisoner of Azkaban") ? "/images/no-cover.png" : (book.CoverImageUrl ?? "/images/no-cover.png"))"
+                                    <img src="@((book.Title == "American Gods" || book.Title == "Harry Potter and the Prisoner of Azkaban") ? "/images/placeholder.jpg" : (book.CoverImageUrl ?? "/images/placeholder.jpg"))"
                                          alt="@book.Title"
-                                         onerror="this.src='/images/no-cover.png'" />
+                                         onerror="this.src='/images/placeholder.jpg'" />
                                 </div>
                                 <div class="content-item-info">
                                     <h6 class="content-item-title">@book.Title</h6>
