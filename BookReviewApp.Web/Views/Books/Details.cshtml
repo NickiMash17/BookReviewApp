@@ -46,10 +46,10 @@
                             </dl>
 
                             <div class="mt-3">
-                                <a asp-action="Edit" asp-route-id="@Model.BookId" class="btn btn-warning" aria-label="Edit @Model.Title">
+                                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning" aria-label="Edit @Model.Title">
                                     <i class="bi bi-pencil"></i> Edit
                                 </a>
-                                <a asp-action="Delete" asp-route-id="@Model.BookId" class="btn btn-danger" aria-label="Delete @Model.Title">
+                                <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger" aria-label="Delete @Model.Title">
                                     <i class="bi bi-trash"></i> Delete
                                 </a>
                                 <a asp-action="Index" class="btn btn-secondary" aria-label="Back to book list">
@@ -74,7 +74,7 @@
                                 <i class="bi bi-star-fill"></i> @ViewBag.AverageRating.ToString("F1") / 5.0
                             </span>
                         }
-                        <a asp-action="Create" asp-controller="Reviews" asp-route-bookId="@Model.BookId" 
+                        <a asp-action="Create" asp-controller="Reviews" asp-route-bookId="@Model.Id" 
                            class="btn btn-success btn-sm">
                             <i class="bi bi-plus-circle"></i> Add Review
                         </a>
@@ -130,7 +130,7 @@
                         <div class="text-center text-muted py-4">
                             <i class="bi bi-chat-dots" style="font-size: 3rem;"></i>
                             <p class="mt-2">No reviews yet. Be the first to review this book!</p>
-                            <a asp-action="Create" asp-controller="Reviews" asp-route-bookId="@Model.BookId" 
+                            <a asp-action="Create" asp-controller="Reviews" asp-route-bookId="@Model.Id" 
                                class="btn btn-primary">
                                 <i class="bi bi-plus-circle"></i> Add First Review
                             </a>

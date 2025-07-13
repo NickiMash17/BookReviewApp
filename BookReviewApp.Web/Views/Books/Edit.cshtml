@@ -16,7 +16,7 @@
                 <div class="card-body">
                     <form asp-action="Edit" method="post">
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                        <input type="hidden" asp-for="BookId" />
+                        <input type="hidden" asp-for="Id" />
                         
                         <div class="row">
                             <div class="col-md-8">
@@ -28,7 +28,7 @@
 
                                 <div class="mb-3">
                                     <label asp-for="AuthorId" class="form-label">Author</label>
-                                    <select asp-for="AuthorId" class="form-select" asp-items="@(new SelectList(ViewBag.Authors, "AuthorId", "Name"))">
+                                    <select asp-for="AuthorId" class="form-select" asp-items="@(new SelectList(ViewBag.Authors, "Id", "Name"))">
                                         <option value="">-- Select Author --</option>
                                     </select>
                                     <span asp-validation-for="AuthorId" class="text-danger"></span>

@@ -1,51 +1,98 @@
 @model BookReviewApp.Domain.Models.Book
 
-<h1>Add New Book</h1>
+@{
+    ViewData["Title"] = "Add New Book";
+}
 
-<div class="row">
+<div class="container py-5">
+    <div class="row justify-content-center">
     <div class="col-md-8">
-        <form asp-action="Create" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">
+                        <i class="bi bi-book-plus"></i> Add New Book
+                    </h2>
+                </div>
+                <div class="card-body">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="bi bi-check-circle"></i> @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle"></i> @TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+                    <form asp-action="Create" enctype="multipart/form-data" novalidate>
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
             <!-- Basic Book Information -->
-            <div class="form-group">
-                <label asp-for="Title" class="control-label">Book Title</label>
+                        <div class="mb-3">
+                            <label asp-for="Title" class="form-label">Book Title *</label>
                 <input asp-for="Title" class="form-control" placeholder="Enter the full title of the book" />
                 <span asp-validation-for="Title" class="text-danger"></span>
                 <small class="form-text text-muted">Include subtitle if applicable</small>
             </div>
 
-            <div class="form-group">
-                <label asp-for="AuthorId" class="control-label">Author</label>
-                <select asp-for="AuthorId" class="form-control" asp-items="@(new SelectList(ViewBag.Authors, "AuthorId", "Name"))">
+                        <div class="mb-3">
+                            <label asp-for="AuthorId" class="form-label">Author *</label>
+                            @if (ViewBag.Authors != null && ((IEnumerable<dynamic>)ViewBag.Authors).Any())
+                            {
+                                <select asp-for="AuthorId" class="form-select" asp-items="@(new SelectList(ViewBag.Authors, "Id", "Name"))">
                     <option value="">-- Select Author --</option>
                 </select>
                 <span asp-validation-for="AuthorId" class="text-danger"></span>
+                                <small class="form-text text-muted">
+                                    <a asp-controller="Authors" asp-action="Create" target="_blank" class="text-decoration-none">
+                                        <i class="bi bi-plus-circle"></i> Add new author
+                                    </a>
+                                </small>
+                            }
+                            else
+                            {
+                                <div class="alert alert-warning">
+                                    <i class="bi bi-exclamation-triangle"></i> No authors found. 
+                                    <a asp-controller="Authors" asp-action="Create" class="alert-link">Add an author first</a> before creating a book.
+                                </div>
+                            }
             </div>
 
             <!-- Publishing Details -->
-            <div class="form-group">
-                <label asp-for="ISBN" class="control-label">ISBN</label>
-                <input asp-for="ISBN" class="form-control" placeholder="Enter 13-digit ISBN" />
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="ISBN" class="form-label">ISBN</label>
+                                    <input asp-for="ISBN" class="form-control" placeholder="978-XXXXXXXXXX" />
                 <span asp-validation-for="ISBN" class="text-danger"></span>
                 <small class="form-text text-muted">Format: 978-XXXXXXXXXX</small>
             </div>
-
-            <div class="form-group">
-                <label asp-for="PublishedDate" class="control-label">Publication Date</label>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="PublishedDate" class="form-label">Publication Date</label>
                 <input asp-for="PublishedDate" class="form-control" type="date" />
                 <span asp-validation-for="PublishedDate" class="text-danger"></span>
+                                </div>
+                            </div>
             </div>
 
-            <div class="form-group">
-                <label asp-for="Price" class="control-label">Price (USD)</label>
-                <input asp-for="Price" class="form-control" placeholder="19.99" />
+                        <div class="mb-3">
+                            <label asp-for="Price" class="form-label">Price (USD)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input asp-for="Price" class="form-control" type="number" step="0.01" min="0" placeholder="19.99" />
+                            </div>
                 <span asp-validation-for="Price" class="text-danger"></span>
             </div>
 
             <!-- Book Details -->
-            <div class="form-group">
-                <label asp-for="Description" class="control-label">Book Description</label>
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label">Book Description</label>
                 <textarea asp-for="Description" class="form-control" rows="5" 
                           placeholder="Enter a compelling description of the book"></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
@@ -53,32 +100,73 @@
             </div>
 
             <!-- Cover Image Upload -->
-            <div class="form-group">
-                <label for="CoverImage" class="control-label">Cover Image</label>
+                        <div class="mb-4">
+                            <label for="CoverImage" class="form-label">Cover Image</label>
                 <input type="file" id="CoverImage" name="CoverImage" class="form-control" 
-                       accept="image/jpeg,image/png" />
+                                   accept="image/jpeg,image/png,image/webp" />
                 <small class="form-text text-muted">Recommended size: 600x900 pixels, max 2MB</small>
+                            <div id="imagePreview" class="mt-2" style="display: none;">
+                                <img id="previewImg" class="img-thumbnail" style="max-width: 200px; max-height: 300px;" />
+                            </div>
             </div>
 
-            <div class="form-group mt-4">
-                <button type="submit" class="btn btn-primary">Create Book</button>
-                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Back to List
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Create Book
+                            </button>
             </div>
         </form>
+                </div>
+            </div>
     </div>
     
     <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">
-                <h5>Tips for Adding Books</h5>
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="bi bi-lightbulb"></i> Tips for Adding Books
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success"></i> Verify ISBN on the book's copyright page
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success"></i> Use high-quality cover images
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success"></i> Write clear, concise descriptions
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success"></i> Double-check publication date
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success"></i> Ensure author is in the system
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm mt-3">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0">
+                        <i class="bi bi-info-circle"></i> Quick Actions
+                    </h6>
             </div>
             <div class="card-body">
-                <ul class="list-unstyled">
-                    <li>✓ Verify ISBN on the book's copyright page</li>
-                    <li>✓ Use high-quality cover images</li>
-                    <li>✓ Write clear, concise descriptions</li>
-                    <li>✓ Double-check publication date</li>
-                </ul>
+                    <div class="d-grid gap-2">
+                        <a asp-controller="Authors" asp-action="Create" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-person-plus"></i> Add New Author
+                        </a>
+                        <a asp-controller="Books" asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-list"></i> View All Books
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -89,13 +177,84 @@
     <script>
         // Show preview of uploaded cover image
         document.getElementById('CoverImage').addEventListener('change', function (e) {
-            if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            const preview = document.getElementById('imagePreview');
+            const previewImg = document.getElementById('previewImg');
+            
+            if (file) {
+                // Validate file size (2MB)
+                if (file.size > 2 * 1024 * 1024) {
+                    alert('File size must be less than 2MB');
+                    this.value = '';
+                    preview.style.display = 'none';
+                    return;
+                }
+                
+                // Validate file type
+                if (!file.type.match('image.*')) {
+                    alert('Please select an image file');
+                    this.value = '';
+                    preview.style.display = 'none';
+                    return;
+                }
+                
                 const reader = new FileReader();
                 reader.onload = function (e) {
-                    // You could add preview image display logic here
+                    previewImg.src = e.target.result;
+                    preview.style.display = 'block';
                 };
-                reader.readAsDataURL(e.target.files[0]);
+                reader.readAsDataURL(file);
+            } else {
+                preview.style.display = 'none';
             }
+        });
+        
+        // Auto-refresh author list when returning from author creation
+        if (window.opener && window.opener.location.pathname.includes('/Authors/Create')) {
+            window.opener.location.reload();
+        }
+        
+        // Form validation enhancement
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const submitBtn = form.querySelector('button[type="submit"]');
+            
+            form.addEventListener('submit', function(e) {
+                const title = document.getElementById('Title').value.trim();
+                const authorId = document.getElementById('AuthorId').value;
+                const price = document.getElementById('Price').value;
+                
+                let isValid = true;
+                
+                // Clear previous error styling
+                document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+                
+                // Validate title
+                if (!title) {
+                    document.getElementById('Title').classList.add('is-invalid');
+                    isValid = false;
+                }
+                
+                // Validate author
+                if (!authorId) {
+                    document.getElementById('AuthorId').classList.add('is-invalid');
+                    isValid = false;
+                }
+                
+                // Validate price
+                if (price && parseFloat(price) < 0) {
+                    document.getElementById('Price').classList.add('is-invalid');
+                    isValid = false;
+                }
+                
+                if (!isValid) {
+                    e.preventDefault();
+                    submitBtn.disabled = false;
+                } else {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Creating...';
+                }
+            });
         });
     </script>
 }

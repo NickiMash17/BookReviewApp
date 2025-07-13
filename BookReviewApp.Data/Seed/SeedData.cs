@@ -72,7 +72,8 @@ namespace BookReviewApp.Data.Seed
                 await context.Users.AddRangeAsync(users);
                 await context.SaveChangesAsync();
             }
-            var userDict = context.Users.ToDictionary(u => u.Username, u => u.UserId);
+            // Get ALL users from database, not just the ones we just added
+            var userDict = await context.Users.ToDictionaryAsync(u => u.Username, u => u.Id);
 
             // 2. Seed Authors (idempotent)
             var authorData = new[]
@@ -100,10 +101,22 @@ namespace BookReviewApp.Data.Seed
             }
             if (authors.Count > 0)
             {
-            await context.Authors.AddRangeAsync(authors);
-            await context.SaveChangesAsync();
+                await context.Authors.AddRangeAsync(authors);
+                await context.SaveChangesAsync();
             }
-            var authorDict = context.Authors.ToDictionary(a => a.Name, a => a.AuthorId);
+            
+            // Get ALL authors from database, not just the ones we just added
+            // Force a fresh query to ensure we get the latest data
+            await context.SaveChangesAsync(); // Ensure all changes are committed
+            var allAuthors = await context.Authors.ToListAsync();
+            var authorDict = allAuthors.ToDictionary(a => a.Name, a => a.Id);
+            
+            // Debug: Log the authors we found
+            Console.WriteLine($"Found {allAuthors.Count} authors in database:");
+            foreach (var author in allAuthors)
+            {
+                Console.WriteLine($"  - {author.Name}: {author.Id}");
+            }
 
             // 3. Seed Books (idempotent)
             var bookData = new[]
@@ -130,6 +143,14 @@ namespace BookReviewApp.Data.Seed
             {
                 if (!context.Books.Any(x => x.Title == b.Title))
                 {
+                    // Debug: Check if author exists in dictionary
+                    if (!authorDict.ContainsKey(b.Author))
+                    {
+                        Console.WriteLine($"ERROR: Author '{b.Author}' not found in authorDict for book '{b.Title}'");
+                        Console.WriteLine($"Available authors: {string.Join(", ", authorDict.Keys)}");
+                        continue; // Skip this book for now
+                    }
+                    
                     books.Add(new Book { Title = b.Title, Description = b.Description, ISBN = b.ISBN, PublishedDate = b.PublishedDate, Price = b.Price, CoverImageUrl = b.CoverImageUrl, AuthorId = authorDict[b.Author], CreatedAt = DateTime.UtcNow });
                 }
             }
@@ -138,7 +159,8 @@ namespace BookReviewApp.Data.Seed
                 await context.Books.AddRangeAsync(books);
                 await context.SaveChangesAsync();
             }
-            var bookDict = context.Books.ToDictionary(b => b.Title, b => b.BookId);
+            // Get ALL books from database, not just the ones we just added
+            var bookDict = await context.Books.ToDictionaryAsync(b => b.Title, b => b.Id);
 
             // 4. Seed Reviews (idempotent)
             var reviewData = new[]
@@ -210,7 +232,8 @@ namespace BookReviewApp.Data.Seed
                 await context.Categories.AddRangeAsync(categories);
                 await context.SaveChangesAsync();
             }
-            var categoryDict = context.Categories.ToDictionary(c => c.Name, c => c.CategoryId);
+            // Get ALL categories from database, not just the ones we just added
+            var categoryDict = await context.Categories.ToDictionaryAsync(c => c.Name, c => c.Id);
 
             // 6. Assign some books to categories (idempotent)
             var bookCategoryData = new[]
@@ -242,8 +265,12 @@ namespace BookReviewApp.Data.Seed
         private static async Task ResetDatabaseAsync(ApplicationDbContext context)
         {
             // Remove existing data in reverse order of dependencies
+            context.Reviews.RemoveRange(await context.Reviews.ToListAsync());
+            context.BookCategories.RemoveRange(await context.BookCategories.ToListAsync());
             context.Books.RemoveRange(await context.Books.ToListAsync());
             context.Authors.RemoveRange(await context.Authors.ToListAsync());
+            context.Categories.RemoveRange(await context.Categories.ToListAsync());
+            context.Users.RemoveRange(await context.Users.ToListAsync());
             await context.SaveChangesAsync();
         }
     }

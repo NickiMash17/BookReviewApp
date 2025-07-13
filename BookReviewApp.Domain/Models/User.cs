@@ -1,11 +1,13 @@
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using System.ComponentModel.DataAnnotations;
 
 namespace BookReviewApp.Domain.Models
 {
     public class User : BaseEntity
     {
-        [Key]
-        public int UserId { get; set; }
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string UserId { get; set; } = ObjectId.GenerateNewId().ToString();
         
         [Required]
         [StringLength(100)]
@@ -32,11 +34,15 @@ namespace BookReviewApp.Domain.Models
         public bool IsActive { get; set; } = true;
         public bool EmailConfirmed { get; set; } = false;
         
+        [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
         public DateTime? LastLoginDate { get; set; }
         
         [StringLength(200)]
         public string? ProfilePictureUrl { get; set; }
         
+        public bool IsAdmin { get; set; } = false;
+        
+        [BsonIgnore]
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
     }
 } 

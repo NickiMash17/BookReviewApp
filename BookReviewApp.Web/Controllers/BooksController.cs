@@ -6,6 +6,7 @@ using BookReviewApp.Services.Interfaces;
 using BookReviewApp.Domain.Models;
 using BookReviewApp.Web.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 
 namespace BookReviewApp.Web.Controllers
 {
@@ -38,7 +39,7 @@ namespace BookReviewApp.Web.Controllers
             }
         }
 
-        public async Task<IActionResult> Details(int id)
+        public async Task<IActionResult> Details(string id)
         {
             try
             {
@@ -79,31 +80,61 @@ namespace BookReviewApp.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Book book)
+        public async Task<IActionResult> Create(Book book, IFormFile? CoverImage)
         {
+            IEnumerable<Author> authors = null;
             try
             {
                 if (ModelState.IsValid)
                 {
+                    // Handle cover image upload
+                    if (CoverImage != null && CoverImage.Length > 0)
+                    {
+                        var allowedTypes = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+                        var ext = Path.GetExtension(CoverImage.FileName).ToLowerInvariant();
+                        if (!allowedTypes.Contains(ext))
+                        {
+                            ModelState.AddModelError("", "Only JPG, PNG, or WEBP images are allowed.");
+                            authors = await _authorService.GetAllAuthorsAsync();
+                            ViewBag.Authors = authors;
+                            return View(book);
+                        }
+                        if (CoverImage.Length > 2 * 1024 * 1024)
+                        {
+                            ModelState.AddModelError("", "Image size must be less than 2MB.");
+                            authors = await _authorService.GetAllAuthorsAsync();
+                            ViewBag.Authors = authors;
+                            return View(book);
+                        }
+                        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/books");
+                        Directory.CreateDirectory(uploadsFolder);
+                        var fileName = $"book_{DateTime.Now.Ticks}{ext}";
+                        var filePath = Path.Combine(uploadsFolder, fileName);
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await CoverImage.CopyToAsync(stream);
+                        }
+                        book.CoverImageUrl = $"/images/books/{fileName}";
+                    }
                     await _bookService.AddBookAsync(book);
                     TempData["SuccessMessage"] = "Book created successfully!";
                     return RedirectToAction(nameof(Index));
                 }
-
-                var authors = await _authorService.GetAllAuthorsAsync();
+                authors = await _authorService.GetAllAuthorsAsync();
                 ViewBag.Authors = authors;
                 return View(book);
             }
             catch (Exception)
             {
                 ModelState.AddModelError("", "An error occurred while creating the book.");
-                var authors = await _authorService.GetAllAuthorsAsync();
+                if (authors == null)
+                    authors = await _authorService.GetAllAuthorsAsync();
                 ViewBag.Authors = authors;
                 return View(book);
             }
         }
 
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Edit(string id)
         {
             try
             {
@@ -125,11 +156,11 @@ namespace BookReviewApp.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Book book)
+        public async Task<IActionResult> Edit(string id, Book book)
         {
             try
             {
-                if (id != book.BookId)
+                if (id != book.Id)
                 {
                     return NotFound();
                 }
@@ -154,7 +185,7 @@ namespace BookReviewApp.Web.Controllers
             }
         }
 
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(string id)
         {
             try
             {
@@ -174,7 +205,7 @@ namespace BookReviewApp.Web.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(string id)
         {
             try
             {

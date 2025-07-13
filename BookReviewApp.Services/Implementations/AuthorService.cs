@@ -23,7 +23,7 @@ namespace BookReviewApp.Services.Implementations
             return await _authorRepository.GetAllAsync();
         }
 
-        public async Task<Author?> GetAuthorByIdAsync(int id)
+        public async Task<Author?> GetAuthorByIdAsync(string id)
         {
             return await _authorRepository.GetByIdAsync(id);
         }
@@ -39,7 +39,7 @@ namespace BookReviewApp.Services.Implementations
             await _authorRepository.UpdateAsync(author);
         }
 
-        public async Task DeleteAuthorAsync(int id)
+        public async Task DeleteAuthorAsync(string id)
         {
             await _authorRepository.DeleteAsync(id);
         }
@@ -50,9 +50,9 @@ namespace BookReviewApp.Services.Implementations
                 include: query => query.Include(a => a.Books));
         }
 
-        public async Task<bool> AuthorExistsAsync(int id)
+        public async Task<bool> AuthorExistsAsync(string id)
         {
-            return await _authorRepository.ExistsAsync(a => a.AuthorId == id);
+            return await _authorRepository.ExistsAsync(a => a.Id == id);
         }
     }
 } 

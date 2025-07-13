@@ -1,11 +1,13 @@
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using System.ComponentModel.DataAnnotations;
 
 namespace BookReviewApp.Domain.Models
 {
     public class Category : BaseEntity
     {
-        [Key]
-        public int CategoryId { get; set; }
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string CategoryId { get; set; } = ObjectId.GenerateNewId().ToString();
         
         [Required]
         [StringLength(50)]
@@ -14,6 +16,7 @@ namespace BookReviewApp.Domain.Models
         [StringLength(200)]
         public string? Description { get; set; }
         
+        [BsonIgnore]
         public ICollection<BookCategory> BookCategories { get; set; } = new List<BookCategory>();
     }
 }

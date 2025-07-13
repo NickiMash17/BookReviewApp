@@ -30,10 +30,10 @@
                                 <p class="mt-3">@Model.Biography</p>
                             }
                             <div class="mt-4">
-                                <a asp-action="Edit" asp-route-id="@Model.AuthorId" class="btn btn-warning me-2" aria-label="Edit @Model.Name">
+                                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning me-2" aria-label="Edit @Model.Name">
                                     <i class="bi bi-pencil"></i> Edit
                                 </a>
-                                <a asp-action="Delete" asp-route-id="@Model.AuthorId" class="btn btn-danger me-2" aria-label="Delete @Model.Name">
+                                <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger me-2" aria-label="Delete @Model.Name">
                                     <i class="bi bi-trash"></i> Delete
                                 </a>
                                 <a asp-action="Index" class="btn btn-secondary" aria-label="Back to author list">
@@ -70,7 +70,7 @@
                                                     <span class="badge bg-secondary me-2"><i class="bi bi-calendar"></i> @book.PublishedDate.ToString("yyyy")</span>
                                                     <span class="badge bg-info"><i class="bi bi-currency-dollar"></i> @book.Price.ToString("F2")</span>
                                                 </div>
-                                                <a asp-action="Details" asp-controller="Books" asp-route-id="@book.BookId" class="btn btn-primary btn-sm" aria-label="View details for @book.Title">
+                                                <a asp-action="Details" asp-controller="Books" asp-route-id="@book.Id" class="btn btn-primary btn-sm" aria-label="View details for @book.Title">
                                                     <i class="bi bi-eye"></i> View Details
                                                 </a>
                                             </div>

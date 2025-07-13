@@ -24,7 +24,7 @@ namespace BookReviewApp.Services.Implementations
             return await _userRepository.GetAllAsync();
         }
 
-        public async Task<User?> GetUserByIdAsync(int id)
+        public async Task<User?> GetUserByIdAsync(string id)
         {
             return await _userRepository.GetByIdAsync(id);
         }
@@ -56,12 +56,12 @@ namespace BookReviewApp.Services.Implementations
             await _userRepository.UpdateAsync(user);
         }
 
-        public async Task DeleteUserAsync(int id)
+        public async Task DeleteUserAsync(string id)
         {
             await _userRepository.DeleteAsync(id);
         }
 
-        public async Task<bool> UserExistsAsync(int id)
+        public async Task<bool> UserExistsAsync(string id)
         {
             return await _userRepository.ExistsAsync(u => u.UserId == id);
         }
@@ -86,7 +86,7 @@ namespace BookReviewApp.Services.Implementations
             return result == PasswordVerificationResult.Success;
         }
 
-        public async Task UpdateLastLoginAsync(int userId)
+        public async Task UpdateLastLoginAsync(string userId)
         {
             var user = await GetUserByIdAsync(userId);
             if (user != null)

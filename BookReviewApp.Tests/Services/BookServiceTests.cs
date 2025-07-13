@@ -26,15 +26,15 @@ namespace BookReviewApp.Tests.Services
             {
                 new Book
                 {
-                    BookId = 1,
+                    Id = "1",
                     Title = "Test Book 1",
-                    Author = new Author { AuthorId = 1, Name = "Test Author 1" }
+                    Author = new Author { Id = "1", Name = "Test Author 1" }
                 },
                 new Book
                 {
-                    BookId = 2,
+                    Id = "2",
                     Title = "Test Book 2",
-                    Author = new Author { AuthorId = 2, Name = "Test Author 2" }
+                    Author = new Author { Id = "2", Name = "Test Author 2" }
                 }
             };
 
@@ -51,9 +51,9 @@ namespace BookReviewApp.Tests.Services
             result.Should().NotBeNull();
             result.Should().HaveCount(2);
             result.Should().BeEquivalentTo(testData, options => 
-                options.Including(b => b.BookId)
+                options.Including(b => b.Id)
                        .Including(b => b.Title)
-                       .Including(b => b.Author.AuthorId)
+                       .Including(b => b.Author.Id)
                        .Including(b => b.Author.Name));
 
             _mockBookRepository.Verify(

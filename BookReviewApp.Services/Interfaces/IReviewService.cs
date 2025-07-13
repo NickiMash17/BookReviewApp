@@ -5,13 +5,13 @@ namespace BookReviewApp.Services.Interfaces
     public interface IReviewService
     {
         Task<IEnumerable<Review>> GetAllReviewsAsync();
-        Task<Review?> GetReviewByIdAsync(int id);
-        Task<IEnumerable<Review>> GetReviewsByBookIdAsync(int bookId);
+        Task<Review?> GetReviewByIdAsync(string id);
+        Task<IEnumerable<Review>> GetReviewsByBookIdAsync(string bookId);
         Task<Review> AddReviewAsync(Review review);
         Task UpdateReviewAsync(Review review);
-        Task DeleteReviewAsync(int id);
+        Task DeleteReviewAsync(string id);
         Task<IEnumerable<Review>> GetReviewsWithUserAndBookAsync();
-        Task<double> GetAverageRatingForBookAsync(int bookId);
-        Task<bool> ReviewExistsAsync(int id);
+        Task<double> GetAverageRatingForBookAsync(string bookId);
+        Task<bool> ReviewExistsAsync(string id);
     }
 } 

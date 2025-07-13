@@ -2,15 +2,15 @@
 // This file and all code in this project are the original work of Nicolette Mashaba (nickimash).
 // All rights reserved. Do not copy or redistribute without permission.
 //
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BookReviewApp.Domain.Models
 {
     public class Book : BaseEntity
     {
-        [Key]
-        public int BookId { get; set; }
+        // Removed BookId property. Use Id from BaseEntity as PK.
         
         [Required]
         [StringLength(100)]
@@ -22,20 +22,26 @@ namespace BookReviewApp.Domain.Models
         [StringLength(20)]
         public string? ISBN { get; set; }
         
-        [DataType(DataType.Date)]
+        [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
         public DateTime PublishedDate { get; set; }
         
-        [Column(TypeName = "decimal(18, 2)")]
+        [Range(0, double.MaxValue, ErrorMessage = "Price must be a positive number")]
         public decimal Price { get; set; }
         
         [StringLength(200)]
         public string? CoverImageUrl { get; set; }
         
         [Required]
-        public int AuthorId { get; set; }
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string AuthorId { get; set; } = string.Empty; // FK to Author.Id
         
-        public Author Author { get; set; } = null!;
+        [BsonIgnore]
+        public Author? Author { get; set; }
+        
+        [BsonIgnore]
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
+        
+        [BsonIgnore]
         public ICollection<BookCategory> BookCategories { get; set; } = new List<BookCategory>();
     }
 }

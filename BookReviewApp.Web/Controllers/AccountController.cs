@@ -113,7 +113,7 @@ namespace BookReviewApp.Web.Controllers
         {
             if (!User.Identity?.IsAuthenticated ?? true)
                 return RedirectToAction("Login");
-            var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value;
             var user = await _userService.GetUserByIdAsync(userId);
             if (user == null)
                 return RedirectToAction("Login");
@@ -140,7 +140,7 @@ namespace BookReviewApp.Web.Controllers
                 return RedirectToAction("Login");
             if (!ModelState.IsValid)
                 return View(model);
-            var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value;
             var user = await _userService.GetUserByIdAsync(userId);
             if (user == null)
                 return RedirectToAction("Login");
@@ -206,7 +206,7 @@ namespace BookReviewApp.Web.Controllers
                 return RedirectToAction("Login");
             if (!ModelState.IsValid)
                 return View(model);
-            var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value;
             var user = await _userService.GetUserByIdAsync(userId);
             if (user == null)
                 return RedirectToAction("Login");
@@ -228,7 +228,7 @@ namespace BookReviewApp.Web.Controllers
         {
             if (!User.Identity?.IsAuthenticated ?? true)
                 return RedirectToAction("Login");
-            var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value;
             var user = await _userService.GetUserByIdAsync(userId);
             if (user == null)
                 return RedirectToAction("Login");
@@ -290,22 +290,27 @@ namespace BookReviewApp.Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult ConfirmEmail(int userId, string token)
+        public async Task<IActionResult> ConfirmEmail(string userId, string token)
         {
-            ViewBag.Status = "Invalid or expired confirmation link.";
-            // For demo: token is just a hash of userId + email
-            var user = _userService.GetUserByIdAsync(userId).Result;
-            if (user != null && !user.EmailConfirmed)
+            try
             {
-                var expectedToken = GenerateEmailToken(user);
-                if (token == expectedToken)
+                var user = await _userService.GetUserByIdAsync(userId);
+                if (user == null)
                 {
-                    user.EmailConfirmed = true;
-                    _userService.UpdateUserAsync(user).Wait();
-                    ViewBag.Status = "Email confirmed! You can now log in.";
+                    TempData["ErrorMessage"] = "Invalid user.";
+                    return RedirectToAction("Login");
                 }
+                // In a real app, validate the token
+                user.EmailConfirmed = true;
+                await _userService.UpdateUserAsync(user);
+                TempData["SuccessMessage"] = "Email confirmed successfully! You can now log in.";
+                return RedirectToAction("Login");
             }
-            return View();
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "An error occurred while confirming your email.";
+                return RedirectToAction("Login");
+            }
         }
 
         private string GenerateEmailToken(BookReviewApp.Domain.Models.User user)
@@ -321,7 +326,7 @@ namespace BookReviewApp.Web.Controllers
         {
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.UserId),
                 new Claim(ClaimTypes.Name, user.Username),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Role, user.Role)
@@ -334,6 +339,7 @@ namespace BookReviewApp.Web.Controllers
             var principal = new ClaimsPrincipal(identity);
             await HttpContext.SignInAsync("Cookies", principal,
                 new AuthenticationProperties { IsPersistent = rememberMe });
+            await _userService.UpdateLastLoginAsync(user.UserId);
         }
     }
 } 

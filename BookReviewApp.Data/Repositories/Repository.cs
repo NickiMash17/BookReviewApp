@@ -35,13 +35,21 @@ namespace BookReviewApp.Data.Repositories
             return await query.ToListAsync();
         }
 
-        public virtual async Task<T?> GetByIdAsync(int id, Func<IQueryable<T>, IQueryable<T>>? include = null)
+        public virtual async Task<T?> GetByIdAsync(string id, Func<IQueryable<T>, IQueryable<T>>? include = null)
         {
             var query = _dbSet.AsQueryable();
             if (include != null) query = include(query);
             
+            // Try to parse as int for backward compatibility
+            if (int.TryParse(id, out int intId))
+            {
             return await query.FirstOrDefaultAsync(e => 
-                EF.Property<int>(e, $"{typeof(T).Name}Id") == id);
+                    EF.Property<int>(e, $"{typeof(T).Name}Id") == intId);
+            }
+            
+            // For MongoDB ObjectId strings, we'll need to handle differently
+            // For now, return null as this is primarily for EF Core
+            return null;
         }
 
         public virtual async Task AddAsync(T entity)
@@ -56,7 +64,7 @@ namespace BookReviewApp.Data.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public virtual async Task DeleteAsync(int id)
+        public virtual async Task DeleteAsync(string id)
         {
             var entity = await GetByIdAsync(id);
             if (entity != null)

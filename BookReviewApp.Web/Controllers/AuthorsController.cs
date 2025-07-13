@@ -33,7 +33,7 @@ namespace BookReviewApp.Web.Controllers
             }
         }
 
-        public async Task<IActionResult> Details(int id)
+        public async Task<IActionResult> Details(string id)
         {
             try
             {
@@ -82,7 +82,7 @@ namespace BookReviewApp.Web.Controllers
             }
         }
 
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Edit(string id)
         {
             try
             {
@@ -102,11 +102,11 @@ namespace BookReviewApp.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Author author)
+        public async Task<IActionResult> Edit(string id, Author author)
         {
             try
             {
-                if (id != author.AuthorId)
+                if (id != author.Id)
                 {
                     return NotFound();
                 }
@@ -127,7 +127,7 @@ namespace BookReviewApp.Web.Controllers
             }
         }
 
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(string id)
         {
             try
             {
@@ -151,7 +151,7 @@ namespace BookReviewApp.Web.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(string id)
         {
             try
             {

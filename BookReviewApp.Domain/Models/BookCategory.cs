@@ -1,19 +1,24 @@
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using System.ComponentModel.DataAnnotations;
 
 namespace BookReviewApp.Domain.Models
 {
     public class BookCategory : BaseEntity
     {
-        [Key]
-        public int BookCategoryId { get; set; }
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string BookCategoryId { get; set; } = ObjectId.GenerateNewId().ToString();
         
-        [Required]
-        public int BookId { get; set; }
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string BookId { get; set; } = string.Empty;
         
-        [Required]
-        public int CategoryId { get; set; }
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string CategoryId { get; set; } = string.Empty;
         
-        public Book Book { get; set; } = null!;
-        public Category Category { get; set; } = null!;
+        [BsonIgnore]
+        public Book? Book { get; set; }
+        
+        [BsonIgnore]
+        public Category? Category { get; set; }
     }
 }

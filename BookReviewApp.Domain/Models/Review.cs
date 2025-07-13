@@ -2,14 +2,16 @@
 // This file and all code in this project are the original work of Nicolette Mashaba (nickimash).
 // All rights reserved. Do not copy or redistribute without permission.
 //
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using System.ComponentModel.DataAnnotations;
 
 namespace BookReviewApp.Domain.Models
 {
     public class Review : BaseEntity
     {
-        [Key]
-        public int ReviewId { get; set; }
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string ReviewId { get; set; } = ObjectId.GenerateNewId().ToString();
         
         [Required]
         [Range(1, 5)]
@@ -18,17 +20,20 @@ namespace BookReviewApp.Domain.Models
         [StringLength(1000)]
         public string? Comment { get; set; }
         
-        [Required]
-        public int BookId { get; set; }
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string BookId { get; set; } = string.Empty;
         
-        public Book Book { get; set; } = null!;
+        [BsonIgnore]
+        public Book? Book { get; set; }
         
-        [Required]
-        public int UserId { get; set; }
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string UserId { get; set; } = string.Empty;
         
-        public User User { get; set; } = null!;
+        [BsonIgnore]
+        public User? User { get; set; }
         
-        public DateTime ReviewDate { get; set; } = DateTime.Now;
+        [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
+        public DateTime ReviewDate { get; set; } = DateTime.UtcNow;
         
         public bool IsApproved { get; set; } = true;
     }

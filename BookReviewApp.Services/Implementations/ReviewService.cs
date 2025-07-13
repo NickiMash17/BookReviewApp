@@ -23,12 +23,12 @@ namespace BookReviewApp.Services.Implementations
             return await _reviewRepository.GetAllAsync();
         }
 
-        public async Task<Review?> GetReviewByIdAsync(int id)
+        public async Task<Review?> GetReviewByIdAsync(string id)
         {
             return await _reviewRepository.GetByIdAsync(id);
         }
 
-        public async Task<IEnumerable<Review>> GetReviewsByBookIdAsync(int bookId)
+        public async Task<IEnumerable<Review>> GetReviewsByBookIdAsync(string bookId)
         {
             return await _reviewRepository.GetAllAsync(
                 include: query => query
@@ -49,7 +49,7 @@ namespace BookReviewApp.Services.Implementations
             await _reviewRepository.UpdateAsync(review);
         }
 
-        public async Task DeleteReviewAsync(int id)
+        public async Task DeleteReviewAsync(string id)
         {
             await _reviewRepository.DeleteAsync(id);
         }
@@ -63,7 +63,7 @@ namespace BookReviewApp.Services.Implementations
                     .Include(r => r.Book.Author));
         }
 
-        public async Task<double> GetAverageRatingForBookAsync(int bookId)
+        public async Task<double> GetAverageRatingForBookAsync(string bookId)
         {
             var reviews = await _reviewRepository.GetAllAsync(
                 filter: query => query.Where(r => r.BookId == bookId && r.IsApproved));
@@ -74,7 +74,7 @@ namespace BookReviewApp.Services.Implementations
             return reviews.Average(r => r.Rating);
         }
 
-        public async Task<bool> ReviewExistsAsync(int id)
+        public async Task<bool> ReviewExistsAsync(string id)
         {
             return await _reviewRepository.ExistsAsync(r => r.ReviewId == id);
         }

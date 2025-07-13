@@ -17,7 +17,7 @@ namespace BookReviewApp.Web.Controllers
             return View(reviews);
         }
 
-        public async Task<IActionResult> Details(int id)
+        public async Task<IActionResult> Details(string id)
         {
             var review = (await _reviewService.GetReviewsWithUserAndBookAsync()).FirstOrDefault(r => r.ReviewId == id);
             if (review == null)
