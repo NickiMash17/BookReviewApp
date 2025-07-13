@@ -1,110 +1,154 @@
 # MongoDB Setup Guide for BookReviewApp
 
-This guide will help you set up both local MongoDB and MongoDB Atlas for your BookReviewApp presentation.
+This comprehensive guide will help you set up MongoDB for the BookReviewApp, supporting both local MongoDB and MongoDB Atlas cloud deployment.
+
+## 📋 Prerequisites
+
+- [.NET 6.0 SDK](https://dotnet.microsoft.com/download/dotnet/6.0) or later
+- [MongoDB Community Server](https://www.mongodb.com/try/download/community) (for local development)
+- [MongoDB Compass](https://www.mongodb.com/try/download/compass) (GUI tool for database management)
+- Internet connection (for MongoDB Atlas setup)
 
 ## 🏠 Local MongoDB Setup
 
 ### Step 1: Install MongoDB Community Server
 
-**Option A: Using winget (Windows)**
+**Windows Installation**
+
+**Option A: Using winget (Recommended)**
 ```bash
 winget install MongoDB.Server
 ```
 
 **Option B: Manual Installation**
-1. Go to [MongoDB Download Center](https://www.mongodb.com/try/download/community)
+1. Visit [MongoDB Download Center](https://www.mongodb.com/try/download/community)
 2. Download MongoDB Community Server for Windows
 3. Run the installer and follow the setup wizard
-4. Install MongoDB Compass (GUI tool) when prompted
+4. Install MongoDB Compass when prompted during installation
 
-### Step 2: Start MongoDB Service
-
-**Windows Service (Automatic)**
-- MongoDB should start automatically as a Windows service
-- Check Services app: `mongod` service should be running
-
-**Manual Start (if needed)**
+**macOS Installation**
 ```bash
-# Start MongoDB service
-net start MongoDB
+# Using Homebrew
+brew tap mongodb/brew
+brew install mongodb-community
 
-# Or start manually
-"C:\Program Files\MongoDB\Server\8.0\bin\mongod.exe" --dbpath="C:\data\db"
+# Start MongoDB service
+brew services start mongodb/brew/mongodb-community
 ```
 
-### Step 3: Test Local Connection
+**Linux Installation (Ubuntu)**
+```bash
+# Import MongoDB public GPG key
+wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add -
 
-1. **Start your application**
-2. **Navigate to**: `http://localhost:5000/debug/mongodb/test-local`
-3. **Expected result**: ✅ MongoDB Connected Successfully!
+# Create list file for MongoDB
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+
+# Update package database
+sudo apt-get update
+
+# Install MongoDB
+sudo apt-get install -y mongodb-org
+
+# Start MongoDB
+sudo systemctl start mongod
+sudo systemctl enable mongod
+```
+
+### Step 2: Verify MongoDB Installation
+
+**Check MongoDB Service Status**
+```bash
+# Windows
+sc query MongoDB
+
+# macOS/Linux
+sudo systemctl status mongod
+```
+
+**Test MongoDB Connection**
+```bash
+# Connect to MongoDB shell
+mongosh
+
+# Or legacy mongo shell
+mongo
+```
+
+**Expected Output:**
+```
+Current Mongosh Log ID: 64f8a2b3c4d5e6f7g8h9i0j1
+Connecting to:          mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.1
+Using MongoDB:          7.0.4
+Using Mongosh:          2.0.1
+```
+
+### Step 3: Install MongoDB Compass
+
+1. Download [MongoDB Compass](https://www.mongodb.com/try/download/compass)
+2. Install and launch Compass
+3. Connect to local MongoDB: `mongodb://localhost:27017`
+4. Create database: `BookReviewApp`
 
 ## ☁️ MongoDB Atlas Setup
 
 ### Step 1: Create Atlas Account
 
-1. Go to [MongoDB Atlas](https://cloud.mongodb.com/)
+1. Visit [MongoDB Atlas](https://cloud.mongodb.com/)
 2. Click "Try Free" or "Sign Up"
-3. Create account (no credit card required)
+3. Create account (free tier available, no credit card required for basic setup)
 
 ### Step 2: Create Cluster
 
-1. **Choose Cloud Provider**: AWS (recommended)
-2. **Choose Region**: Select closest to your location
-3. **Cluster Tier**: M0 Free (shared, 512MB RAM)
+1. **Choose Cloud Provider**: AWS, Google Cloud, or Azure (AWS recommended)
+2. **Choose Region**: Select closest to your location for better performance
+3. **Cluster Tier**: M0 Free (shared, 512MB RAM) for development
 4. **Cluster Name**: `BookReviewApp-Cluster`
 5. Click "Create"
 
-### Step 3: Set Up Database Access
+### Step 3: Configure Database Access
 
-1. **Go to Database Access** (left sidebar)
-2. **Click "Add New Database User"**
-3. **Configure User**:
-   - Username: `bookreviewapp`
-   - Password: `YourSecurePassword123!`
-   - Role: `Read and write to any database`
-4. **Click "Add User"**
+1. Navigate to **Database Access** in the left sidebar
+2. Click **"Add New Database User"**
+3. Configure user settings:
+   - **Username**: `bookreviewapp`
+   - **Password**: Generate a strong password (12+ characters, mixed case, numbers, symbols)
+   - **Database User Privileges**: `Read and write to any database`
+   - **Built-in Role**: `Atlas admin` (for development) or `Read and write to any database`
+4. Click **"Add User"**
 
-### Step 4: Set Up Network Access
+### Step 4: Configure Network Access
 
-1. **Go to Network Access** (left sidebar)
-2. **Click "Add IP Address"**
-3. **Choose**: "Allow Access from Anywhere" (for demo)
-4. **Click "Confirm"**
+1. Navigate to **Network Access** in the left sidebar
+2. Click **"Add IP Address"**
+3. Choose access method:
+   - **Development**: "Allow Access from Anywhere" (`0.0.0.0/0`)
+   - **Production**: Add specific IP addresses or ranges
+4. Click **"Confirm"**
 
 ### Step 5: Get Connection String
 
-1. **Go to Clusters** (left sidebar)
-2. **Click "Connect"** on your cluster
-3. **Choose "Connect your application"**
-4. **Copy the connection string**
+1. Navigate to **Clusters** in the left sidebar
+2. Click **"Connect"** on your cluster
+3. Choose **"Connect your application"**
+4. Select **.NET** as your driver
+5. Copy the connection string
 
-### Step 6: Update Configuration
-
-1. **Open** `appsettings.Atlas.json`
-2. **Replace** the connection string with your actual Atlas connection string
-3. **Update** username and password in the connection string
-
-### Step 7: Test Atlas Connection
-
-1. **Add Atlas connection string to appsettings.json**:
-```json
-{
-  "AtlasConnectionString": "mongodb+srv://bookreviewapp:YourPassword@cluster0.xxxxx.mongodb.net/?retryWrites=true&w=majority"
-}
+**Connection String Format:**
 ```
-
-2. **Navigate to**: `http://localhost:5000/debug/mongodb/test-atlas`
-3. **Expected result**: ✅ MongoDB Connected Successfully!
+mongodb+srv://bookreviewapp:<password>@cluster0.xxxxx.mongodb.net/?retryWrites=true&w=majority
+```
 
 ## 🔧 Application Configuration
 
-### Switch Between Local and Atlas
+### Update appsettings.json
 
 **For Local MongoDB:**
 ```json
 {
   "MongoDbSettings": {
-    "ConnectionString": "mongodb://localhost:27017",
+    "UseAtlas": false,
+    "LocalConnectionString": "mongodb://localhost:27017/BookReviewApp",
     "DatabaseName": "BookReviewApp"
   }
 }
@@ -114,7 +158,34 @@ net start MongoDB
 ```json
 {
   "MongoDbSettings": {
-    "ConnectionString": "mongodb+srv://bookreviewapp:YourPassword@cluster0.xxxxx.mongodb.net/?retryWrites=true&w=majority",
+    "UseAtlas": true,
+    "ConnectionString": "mongodb+srv://bookreviewapp:YourPassword@cluster0.xxxxx.mongodb.net/BookReviewApp?retryWrites=true&w=majority",
+    "DatabaseName": "BookReviewApp"
+  }
+}
+```
+
+### Environment-Specific Configuration
+
+Create environment-specific configuration files:
+
+**appsettings.Development.json (Local MongoDB)**
+```json
+{
+  "MongoDbSettings": {
+    "UseAtlas": false,
+    "LocalConnectionString": "mongodb://localhost:27017/BookReviewApp",
+    "DatabaseName": "BookReviewApp"
+  }
+}
+```
+
+**appsettings.Production.json (MongoDB Atlas)**
+```json
+{
+  "MongoDbSettings": {
+    "UseAtlas": true,
+    "ConnectionString": "mongodb+srv://bookreviewapp:YourPassword@cluster0.xxxxx.mongodb.net/BookReviewApp?retryWrites=true&w=majority",
     "DatabaseName": "BookReviewApp"
   }
 }
@@ -122,87 +193,152 @@ net start MongoDB
 
 ## 🧪 Testing Your Setup
 
-### Test Endpoints
+### Test Database Connection
 
-1. **MongoDB Status**: `http://localhost:5000/debug/mongodb`
-2. **Local Connection**: `http://localhost:5000/debug/mongodb/test-local`
-3. **Atlas Connection**: `http://localhost:5000/debug/mongodb/test-atlas`
-
-### Expected Results
-
-**Successful Connection:**
-```
-✅ MongoDB Connected Successfully!
-Database: BookReviewApp
-Connection: mongodb://localhost:27017
-Collections: 0
+**Run the application:**
+```bash
+cd BookReviewApp.Web
+dotnet run
 ```
 
-**Failed Connection:**
+**Test endpoints (if available):**
+- Local MongoDB: `http://localhost:5000/debug/mongodb/test-local`
+- Atlas MongoDB: `http://localhost:5000/debug/mongodb/test-atlas`
+
+### Verify with MongoDB Compass
+
+1. **Local MongoDB**: Connect to `mongodb://localhost:27017`
+2. **MongoDB Atlas**: Use the connection string from Atlas dashboard
+3. Verify database `BookReviewApp` exists
+4. Check collections: Books, Authors, Reviews, Users, Categories
+
+### Manual Connection Test
+
+**Using MongoDB Shell:**
+```bash
+# Local MongoDB
+mongosh "mongodb://localhost:27017/BookReviewApp"
+
+# MongoDB Atlas
+mongosh "mongodb+srv://bookreviewapp:YourPassword@cluster0.xxxxx.mongodb.net/BookReviewApp"
 ```
-❌ MongoDB Connection Failed!
-Error: Connection timeout
-Connection: mongodb://localhost:27017
+
+**Test Commands:**
+```javascript
+// Show databases
+show dbs
+
+// Use BookReviewApp database
+use BookReviewApp
+
+// Show collections
+show collections
+
+// Test query
+db.books.find().limit(1)
 ```
-
-## 🎯 Presentation Demo Points
-
-### 1. Show Local MongoDB
-- Open MongoDB Compass
-- Show local database and collections
-- Demonstrate data operations
-
-### 2. Show MongoDB Atlas
-- Open Atlas dashboard
-- Show cluster status
-- Show database collections
-- Demonstrate cloud benefits
-
-### 3. Show Application Integration
-- Run the application
-- Show debug endpoints
-- Demonstrate CRUD operations
-- Show data persistence
-
-### 4. Show Code Changes
-- Domain models with BSON attributes
-- MongoDB repositories
-- Configuration files
-- Service layer updates
 
 ## 🚨 Troubleshooting
 
 ### Local MongoDB Issues
 
-**Service not starting:**
+**Service Not Starting:**
 ```bash
-# Check if MongoDB service exists
+# Windows - Check service status
 sc query MongoDB
 
-# Start service manually
+# Windows - Start service manually
 net start MongoDB
+
+# macOS/Linux - Check service status
+sudo systemctl status mongod
+
+# macOS/Linux - Start service manually
+sudo systemctl start mongod
 ```
 
-**Port already in use:**
+**Port Already in Use:**
 ```bash
 # Check what's using port 27017
-netstat -ano | findstr :27017
+netstat -ano | findstr :27017  # Windows
+lsof -i :27017                 # macOS/Linux
 
 # Kill process if needed
-taskkill /PID <process_id> /F
+taskkill /PID <process_id> /F  # Windows
+kill -9 <process_id>           # macOS/Linux
+```
+
+**Permission Issues:**
+```bash
+# Windows - Run as Administrator
+# macOS/Linux - Check file permissions
+sudo chown -R mongodb:mongodb /var/lib/mongodb
+sudo chmod 755 /var/lib/mongodb
 ```
 
 ### Atlas Issues
 
-**Connection timeout:**
-- Check Network Access settings
-- Verify IP address is allowed
+**Connection Timeout:**
+- Verify Network Access settings allow your IP
 - Check firewall settings
+- Ensure connection string is correct
+- Try connecting from different network
 
-**Authentication failed:**
+**Authentication Failed:**
 - Verify username and password
 - Check database user permissions
-- Ensure connection string is correct
+- Ensure password is URL-encoded in connection string
+- Reset database user password if needed
+
+**TLS/SSL Issues:**
+- Update MongoDB.Driver package to latest version
+- Check .NET version compatibility
+- Verify TLS 1.2 is enabled in application
+
+### Application Issues
+
+**Build Errors:**
+```bash
+# Clean and rebuild
+dotnet clean
+dotnet restore
+dotnet build
+
+# Clear NuGet cache
+dotnet nuget locals all --clear
+```
+
+**Runtime Errors:**
+- Check application logs
+- Verify connection strings
+- Ensure MongoDB service is running
+- Check firewall settings
+
+## 📊 Database Collections
+
+The application uses the following MongoDB collections:
+
+- **Books**: Book information, titles, descriptions, cover images
+- **Authors**: Author details, biographies, photos
+- **Reviews**: User reviews, ratings, comments
+- **Users**: User accounts, profiles, authentication
+- **Categories**: Book categories and genres
+- **BookCategories**: Many-to-many relationship between books and categories
+
+## 🔒 Security Best Practices
+
+### Local Development
+- Use strong passwords for database users
+- Limit network access to localhost only
+- Keep MongoDB updated to latest version
+- Use MongoDB Compass for secure database management
+
+### Production (Atlas)
+- Use strong, unique passwords
+- Enable IP whitelisting for production
+- Use VPC peering for enhanced security
+- Enable MongoDB Atlas security features
+- Regular security audits and updates
 
 ## 📚 Additional Resources
 
@@ -210,21 +346,23 @@ taskkill /PID <process_id> /F
 - [MongoDB Atlas Documentation](https://docs.atlas.mongodb.com/)
 - [MongoDB .NET Driver](https://docs.mongodb.com/drivers/csharp/)
 - [ASP.NET Core with MongoDB](https://docs.microsoft.com/en-us/aspnet/core/tutorials/first-mongo-app)
+- [MongoDB Compass Documentation](https://docs.mongodb.com/compass/)
 
-## 🎉 Success Checklist
+## ✅ Setup Checklist
 
-- [ ] Local MongoDB installed and running
-- [ ] MongoDB Atlas account created
-- [ ] Atlas cluster configured
+- [ ] MongoDB Community Server installed
+- [ ] MongoDB service running
+- [ ] MongoDB Compass installed and connected
+- [ ] Atlas account created (optional)
+- [ ] Atlas cluster configured (optional)
 - [ ] Database user created
 - [ ] Network access configured
-- [ ] Connection strings updated
+- [ ] Connection strings updated in appsettings.json
 - [ ] Application builds successfully
-- [ ] Local connection test passes
-- [ ] Atlas connection test passes
-- [ ] Data operations working
-- [ ] Presentation demo ready
+- [ ] Database connection test passes
+- [ ] Collections created and accessible
+- [ ] Sample data loaded (if applicable)
 
 ---
 
-**Good luck with your presentation! 🚀** 
+**Need help?** Check the troubleshooting section above or refer to the MongoDB documentation for detailed guidance. 

@@ -5,7 +5,7 @@
 ![Original Work](https://img.shields.io/badge/Handcrafted%20by-Nicolette%20Mashaba-blueviolet?style=for-the-badge)
 ![.NET](https://img.shields.io/badge/.NET-6.0-blue?style=for-the-badge&logo=.net)
 ![ASP.NET Core](https://img.shields.io/badge/ASP.NET%20Core-6.0-purple?style=for-the-badge&logo=aspnet)
-![Entity Framework](https://img.shields.io/badge/Entity%20Framework-6.0-green?style=for-the-badge&logo=entity-framework)
+![MongoDB](https://img.shields.io/badge/MongoDB-5.0-green?style=for-the-badge&logo=mongodb)
 ![Bootstrap](https://img.shields.io/badge/Bootstrap-5.0-blue?style=for-the-badge&logo=bootstrap)
 ![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)
 
@@ -16,7 +16,7 @@
 
 ## 🌟 About
 
-A sophisticated, full-stack web application for managing books, authors, and reviews. Built with modern .NET technologies and featuring a beautiful, responsive interface that showcases professional development practices and clean architecture principles.
+A sophisticated, full-stack web application for managing books, authors, and reviews. Built with modern .NET technologies and featuring MongoDB integration for flexible data storage. The application supports both local MongoDB and MongoDB Atlas cloud deployment, showcasing professional development practices and clean architecture principles.
 
 **Perfect for demonstrating full-stack development skills to potential employers.**
 
@@ -32,6 +32,7 @@ A sophisticated, full-stack web application for managing books, authors, and rev
 - **📱 Responsive Design**: Mobile-first design that works seamlessly on all devices
 
 ### 🚀 Advanced Features
+- **🗄️ Dual Database Support**: MongoDB Atlas (cloud) and local MongoDB (Compass)
 - **📊 Analytics Dashboard**: Interactive charts and comprehensive statistics
 - **⚡ Real-time Search**: Instant search results with advanced filtering
 - **🎨 Visual Ratings**: Beautiful star rating displays with average calculations
@@ -53,19 +54,26 @@ A sophisticated, full-stack web application for managing books, authors, and rev
 ```
 BookReviewApp/
 ├── 📦 BookReviewApp.Domain/          # Domain models and interfaces
-├── 🗄️ BookReviewApp.Infrastructure/  # Data access and repositories
+├── 🗄️ BookReviewApp.Data/           # Data access, repositories, and MongoDB context
 ├── ⚙️ BookReviewApp.Services/        # Business logic and services
-└── 🌐 BookReviewApp.Web/            # Web application and controllers
+├── 🌐 BookReviewApp.Web/            # Web application and controllers
+└── 🧪 BookReviewApp.Tests/          # Unit and integration tests
 ```
 
 ### 🔧 Technology Stack
 
 **Backend**
 - ASP.NET Core 6.0
-- Entity Framework Core
-- SQLite/SQL Server support
-- Repository Pattern
+- MongoDB.Driver (latest)
+- Repository Pattern with MongoDB support
 - Dependency Injection
+- Clean Architecture principles
+
+**Database**
+- MongoDB (local and Atlas support)
+- MongoDB Compass (GUI tool)
+- Flexible schema design
+- BSON document storage
 
 **Frontend**
 - Bootstrap 5
@@ -79,6 +87,7 @@ BookReviewApp/
 - SOLID Principles
 - Async/Await patterns
 - Comprehensive error handling
+- MongoDB best practices
 
 ---
 
@@ -87,7 +96,8 @@ BookReviewApp/
 ### Prerequisites
 - [.NET 6.0 SDK](https://dotnet.microsoft.com/download/dotnet/6.0) or later
 - [Visual Studio 2022](https://visualstudio.microsoft.com/) or [VS Code](https://code.visualstudio.com/)
-- Optional: [Docker Desktop](https://www.docker.com/products/docker-desktop) for SQL Server
+- [MongoDB Community Server](https://www.mongodb.com/try/download/community) (for local development)
+- [MongoDB Compass](https://www.mongodb.com/try/download/compass) (GUI tool)
 
 ### 🔧 Installation
 
@@ -102,34 +112,48 @@ BookReviewApp/
    dotnet restore
    ```
 
-3. **Setup database**
+3. **Setup MongoDB**
+   - **Local Setup**: Install MongoDB Community Server and start the service
+   - **Atlas Setup**: Follow the [MongoDB Setup Guide](MONGODB_SETUP.md) for cloud configuration
+
+4. **Configure database connection**
+   - Edit `BookReviewApp.Web/appsettings.json`
+   - Set `UseAtlas: false` for local MongoDB
+   - Set `UseAtlas: true` for MongoDB Atlas
+
+5. **Run the application**
    ```bash
    cd BookReviewApp.Web
-   dotnet ef database update
-   ```
-
-4. **Run the application**
-   ```bash
    dotnet run
    ```
 
-5. **Open in browser**
+6. **Open in browser**
    ```
    🌐 https://localhost:7036
    ```
 
-### 🐳 Docker Setup (Optional - SQL Server)
+### 🗄️ Database Configuration
 
-For production-like database setup:
+**Local MongoDB (Default)**
+```json
+{
+  "MongoDbSettings": {
+    "UseAtlas": false,
+    "LocalConnectionString": "mongodb://localhost:27017/BookReviewApp",
+    "DatabaseName": "BookReviewApp"
+  }
+}
+```
 
-```bash
-# Start SQL Server container
-docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=YourStrong!Passw0rd' \
-  -p 1433:1433 -d mcr.microsoft.com/mssql/server:2019-latest
-
-# Update connection string in appsettings.json
-# Run migrations
-dotnet ef database update
+**MongoDB Atlas (Cloud)**
+```json
+{
+  "MongoDbSettings": {
+    "UseAtlas": true,
+    "ConnectionString": "mongodb+srv://username:password@cluster.mongodb.net/BookReviewApp",
+    "DatabaseName": "BookReviewApp"
+  }
+}
 ```
 
 ---
@@ -154,6 +178,7 @@ dotnet ef database update
 
 ### 💻 Technical Excellence
 - **Clean Architecture**: Proper separation of concerns with layered approach
+- **MongoDB Integration**: Flexible NoSQL database with dual deployment options
 - **Async Operations**: Non-blocking operations throughout the application
 - **Robust Error Handling**: Comprehensive exception handling and logging
 - **Input Validation**: Both client-side and server-side validation
@@ -168,7 +193,7 @@ dotnet ef database update
 
 ### 📊 Data Management
 - **Complete CRUD**: Full Create, Read, Update, Delete operations
-- **Smart Relationships**: Optimized foreign key relationships and includes
+- **Flexible Schema**: MongoDB document-based storage for easy schema evolution
 - **Advanced Search**: Multi-criteria search with real-time results
 - **Flexible Sorting**: Multiple sorting options across all data
 - **Scalable Design**: Ready for pagination and advanced filtering
@@ -206,12 +231,12 @@ dotnet test BookReviewApp.IntegrationTests/
 
 ### 🚀 Deployment Options
 
-**Development**
+**Development (Local MongoDB)**
 ```bash
 dotnet run --environment Development
 ```
 
-**Production**
+**Production (MongoDB Atlas)**
 ```bash
 dotnet publish -c Release -o ./publish
 dotnet ./publish/BookReviewApp.Web.dll
@@ -230,91 +255,62 @@ ENTRYPOINT ["dotnet", "BookReviewApp.Web.dll"]
 
 ## 🗄️ Database
 
-### Default Configuration
-- **Development**: SQLite (local file database)
-- **Production**: SQL Server (configurable)
+### MongoDB Configuration
+- **Development**: Local MongoDB (Compass)
+- **Production**: MongoDB Atlas (cloud)
+- **Flexible Schema**: Document-based storage
+- **Collections**: Books, Authors, Reviews, Users, Categories
 
-### Setup Scripts
-- **Primary**: `setup_bookreviewdb.sql` - Official setup script
-- **Archive**: `BookReviewApp.sql` - Legacy reference
+### Setup Documentation
+- **Primary**: [MongoDB Setup Guide](MONGODB_SETUP.md) - Complete setup instructions
+- **Configuration**: `appsettings.json` - Database connection settings
 
 ### Migration Commands
 ```bash
-# Add new migration
-dotnet ef migrations add MigrationName
+# Seed data (if needed)
+dotnet run --project BookReviewApp.Web --seed
 
-# Update database
-dotnet ef database update
-
-# Generate SQL script
-dotnet ef migrations script
+# Test database connection
+dotnet run --project BookReviewApp.Web --test-db
 ```
+
+---
+
+## 📚 Additional Resources
+
+- [MongoDB Documentation](https://docs.mongodb.com/)
+- [MongoDB Atlas Documentation](https://docs.atlas.mongodb.com/)
+- [MongoDB .NET Driver](https://docs.mongodb.com/drivers/csharp/)
+- [ASP.NET Core with MongoDB](https://docs.microsoft.com/en-us/aspnet/core/tutorials/first-mongo-app)
 
 ---
 
 ## 🤝 Contributing
 
-We welcome contributions! Please follow these steps:
-
-1. **Fork** the repository
-2. **Create** a feature branch (`git checkout -b feature/AmazingFeature`)
-3. **Commit** your changes (`git commit -m 'Add AmazingFeature'`)
-4. **Push** to the branch (`git push origin feature/AmazingFeature`)
-5. **Open** a Pull Request
-
-### Code Standards
-- Follow C# coding conventions
-- Write comprehensive unit tests
-- Update documentation for new features
-- Ensure responsive design compliance
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ---
 
 ## 📄 License
 
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 👩‍💻 Author
+## 👤 Author
 
-<div align="center">
-
-### **Nicolette Mashaba**
-*Full Stack Developer | Polokwane, South Africa*
-
-[![Portfolio](https://img.shields.io/badge/Portfolio-Visit-blueviolet?style=for-the-badge&logo=vercel)](https://nickimash.vercel.app/)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/nicolette-mashaba-b094a5221)
-[![Email](https://img.shields.io/badge/Email-Contact-red?style=for-the-badge&logo=gmail)](mailto:nene171408@gmail.com)
-[![GitHub](https://img.shields.io/badge/GitHub-Follow-black?style=for-the-badge&logo=github)](https://github.com/nickimash)
-
-> *All code, UI/UX, and design are original works by Nicolette Mashaba (nickimash)*  
-> *Please respect intellectual property - do not copy or redistribute without permission*
-
-</div>
-
----
-
-## 🙏 Acknowledgments
-
-- **Bootstrap Team** - For the exceptional UI framework
-- **Microsoft** - For ASP.NET Core and Entity Framework
-- **Bootstrap Icons** - For the beautiful icon library
-- **Chart.js** - For powerful data visualization
-- **Community** - For inspiration and best practices
+**Nicolette Mashaba (nickimash)**
+- GitHub: [@nickimash](https://github.com/nickimash)
+- LinkedIn: [Nicolette Mashaba](https://www.linkedin.com/in/nicolette-mashaba/)
 
 ---
 
 <div align="center">
 
-### ⭐ Star this repository if you found it helpful!
-
-*This project demonstrates modern web development practices, clean architecture, and professional UI/UX design.*
-
-**Perfect showcase for full-stack development skills**
-
----
-
-**Built with ❤️ by Nicolette Mashaba**
+**Made with ❤️ by Nicolette Mashaba**
 
 </div>
