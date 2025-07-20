@@ -222,6 +222,9 @@ body {
     padding: 2rem 0;
     margin-top: 3rem;
     border-radius: 1.5rem 1.5rem 0 0;
+    position: relative;
+    z-index: 1000;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
 }
 
 .footer-blue .social-icons a {
@@ -230,12 +233,14 @@ body {
     font-size: 1.5rem;
     transition: all 0.3s ease;
     opacity: 0.8;
+    text-decoration: none;
 }
 
 .footer-blue .social-icons a:hover {
     color: #fff;
     opacity: 1;
     transform: translateY(-2px);
+    text-decoration: none;
 }
 
 /* Toast Notifications */
@@ -247,7 +252,7 @@ body {
 .trademark-badge {
     position: fixed;
     right: 18px;
-    bottom: 18px;
+    bottom: 120px; /* Increased distance from bottom to avoid footer overlap */
     background: rgba(34, 54, 94, 0.95);
     color: #ffd700;
     font-size: 1.15rem;
@@ -257,13 +262,39 @@ body {
     box-shadow: 0 8px 32px rgba(58,123,213,0.3);
     font-family: 'Segoe UI Semibold', 'Segoe UI', Arial, sans-serif;
     letter-spacing: 0.7px;
-    pointer-events: none;
+    pointer-events: auto; /* Changed to auto so links work */
     user-select: none;
     display: flex;
     align-items: center;
     gap: 0.5em;
     animation: trademark-glow 3s infinite alternate;
     backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.trademark-badge:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 40px rgba(58,123,213,0.4);
+}
+
+.trademark-badge .trademark-link {
+    color: #ffd700;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.trademark-badge .trademark-link:hover {
+    color: #fff;
+}
+
+/* Responsive adjustments for trademark badge */
+@media (max-width: 768px) {
+    .trademark-badge {
+        right: 10px;
+        bottom: 100px;
+        font-size: 1rem;
+        padding: 10px 20px 10px 15px;
+    }
 }
 
 @keyframes trademark-glow {
@@ -279,7 +310,8 @@ body {
 
 /* Ensure main content never gets hidden by footer */
 main.container {
-    padding-bottom: 4rem;
+    padding-bottom: 6rem; /* Increased padding to account for footer and trademark badge */
+    min-height: calc(100vh - 200px); /* Ensure minimum height for content */
 }
 
 /* Card content styling */

@@ -63,11 +63,15 @@
                             <div class="book-overlay">
                                 <div class="overlay-buttons">
                                     <a asp-action="Details" asp-route-id="@book.Id" 
-                                       class="btn btn-light btn-sm me-2" aria-label="View details for @book.Title">
+                                       class="btn btn-light btn-sm me-2" 
+                                       aria-label="View details for @book.Title"
+                                       style="z-index: 10; position: relative;">
                                         <i class="bi bi-eye"></i> Details
                                     </a>
                                     <a asp-action="Create" asp-controller="Reviews" asp-route-bookId="@book.Id" 
-                                       class="btn btn-warning btn-sm" aria-label="Review @book.Title">
+                                       class="btn btn-warning btn-sm" 
+                                       aria-label="Review @book.Title"
+                                       style="z-index: 10; position: relative;">
                                         <i class="bi bi-star"></i> Review
                                     </a>
                                 </div>
@@ -106,8 +110,16 @@
                                     <span class="ms-1 text-muted small">(4.5)</span>
                                 </div>
                                 <div class="action-buttons">
-                                    <a asp-action="Edit" asp-route-id="@book.Id" 
+                                    <a asp-action="Details" asp-route-id="@book.Id" 
                                        class="btn btn-outline-primary btn-sm me-1">
+                                        <i class="bi bi-eye"></i> Details
+                                    </a>
+                                    <a asp-action="Create" asp-controller="Reviews" asp-route-bookId="@book.Id" 
+                                       class="btn btn-outline-warning btn-sm me-1">
+                                        <i class="bi bi-star"></i> Review
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@book.Id" 
+                                       class="btn btn-outline-secondary btn-sm me-1">
                                         <i class="bi bi-pencil"></i>
                                     </a>
                                     <a asp-action="Delete" asp-route-id="@book.Id" 
@@ -202,15 +214,33 @@
         justify-content: center;
         opacity: 0;
         transition: opacity 0.3s ease;
+        pointer-events: auto;
     }
     
     .book-card:hover .book-overlay {
         opacity: 1;
     }
     
+    /* Fallback for mobile devices */
+    @@media (max-width: 768px) {
+        .book-overlay {
+            opacity: 1;
+            background: rgba(0,0,0,0.6);
+        }
+    }
+    
     .overlay-buttons {
         display: flex;
         gap: 0.5rem;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .overlay-buttons .btn {
+        pointer-events: auto;
+        z-index: 10;
+        position: relative;
+        min-width: 80px;
     }
     
     .book-title {

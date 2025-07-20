@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace BookReviewApp.Web.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize] // Allow all authenticated users to access dashboard for development
     public class DashboardController : BaseController
     {
         private readonly IBookService _bookService;

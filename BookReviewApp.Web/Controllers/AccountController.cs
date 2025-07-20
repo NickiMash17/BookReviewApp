@@ -55,15 +55,16 @@ namespace BookReviewApp.Web.Controllers
                     Username = model.Username,
                     PasswordHash = model.Password, // Will be hashed in service
                     FirstName = model.FirstName,
-                    LastName = model.LastName
+                    LastName = model.LastName,
+                    EmailConfirmed = true, // Auto-confirm for development
+                    IsActive = true
                 };
                 await _userService.AddUserAsync(user);
-                // Generate confirmation link for demo
-                var token = GenerateEmailToken(user);
-                var url = Url.Action("ConfirmEmail", "Account", new { userId = user.UserId, token = token }, protocol: Request.Scheme);
-                ViewBag.ConfirmationUrl = url;
-                TempData["SuccessMessage"] = "Registration successful! Please confirm your email.";
-                return View("RegistrationSuccess");
+                
+                // For development: auto-sign in the user
+                await SignInUser(user, false);
+                TempData["SuccessMessage"] = "Registration successful! You are now logged in.";
+                return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)
             {

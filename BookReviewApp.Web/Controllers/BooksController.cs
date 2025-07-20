@@ -42,6 +42,7 @@ namespace BookReviewApp.Web.Controllers
             }
         }
 
+        [AllowAnonymous]
         public async Task<IActionResult> Details(string id)
         {
             try
@@ -67,7 +68,7 @@ namespace BookReviewApp.Web.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize] // Changed from [Authorize(Roles = "Admin")] for development
         public async Task<IActionResult> Create()
         {
             try
@@ -83,7 +84,7 @@ namespace BookReviewApp.Web.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize] // Changed from [Authorize(Roles = "Admin")] for development
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Book book, IFormFile? CoverImage)
         {

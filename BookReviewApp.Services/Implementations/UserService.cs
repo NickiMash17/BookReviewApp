@@ -6,6 +6,7 @@ using BookReviewApp.Domain.Interfaces;
 using BookReviewApp.Domain.Models;
 using BookReviewApp.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using System.Security.Cryptography;
 
 namespace BookReviewApp.Services.Implementations
 {
@@ -55,12 +56,11 @@ namespace BookReviewApp.Services.Implementations
         /// <summary>
         /// Adds a new user to the repository.
         /// </summary>
-        public async Task<User> AddUserAsync(User user)
+        public async Task AddUserAsync(User user)
         {
-            // Hash the password before saving using PasswordHasher
-            user.PasswordHash = _passwordHasher.HashPassword(user, user.PasswordHash);
+            // Hash the password before saving using simple SHA256
+            user.PasswordHash = HashPassword(user.PasswordHash);
             await _userRepository.AddAsync(user);
-            return user;
         }
 
         /// <summary>
@@ -100,8 +100,18 @@ namespace BookReviewApp.Services.Implementations
             if (user == null || !user.IsActive)
                 return false;
 
-            var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, password);
-            return result == PasswordVerificationResult.Success;
+            // For development: use simple SHA256 hashing
+            var hashedPassword = HashPassword(password);
+            return user.PasswordHash == hashedPassword;
+        }
+
+        private string HashPassword(string password)
+        {
+            using (var sha256 = SHA256.Create())
+            {
+                var hashedBytes = sha256.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                return Convert.ToBase64String(hashedBytes);
+            }
         }
 
         public async Task UpdateLastLoginAsync(string userId)

@@ -3,6 +3,8 @@ using BookReviewApp.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace BookReviewApp.Data.Seed
 {
@@ -41,6 +43,25 @@ namespace BookReviewApp.Data.Seed
 
         private static async Task SeedSampleDataAsync(ApplicationDbContext context)
         {
+            // Seed default admin user
+            var adminUser = new User
+            {
+                Email = "admin@bookreview.com",
+                Username = "admin",
+                PasswordHash = HashPassword("Admin123!"),
+                FirstName = "Admin",
+                LastName = "User",
+                Role = "Admin",
+                IsActive = true,
+                EmailConfirmed = true,
+                IsAdmin = true
+            };
+
+            if (!context.Users.Any(u => u.Email == adminUser.Email))
+            {
+                context.Users.Add(adminUser);
+            }
+
             // 1. Seed Users (idempotent)
             var reviewerNames = new[]
             {
@@ -272,6 +293,15 @@ namespace BookReviewApp.Data.Seed
             context.Categories.RemoveRange(await context.Categories.ToListAsync());
             context.Users.RemoveRange(await context.Users.ToListAsync());
             await context.SaveChangesAsync();
+        }
+
+        private static string HashPassword(string password)
+        {
+            using (var sha256 = SHA256.Create())
+            {
+                var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+                return Convert.ToBase64String(hashedBytes);
+            }
         }
     }
 }

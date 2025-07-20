@@ -49,11 +49,10 @@ namespace BookReviewApp.Services.Implementations
         /// <summary>
         /// Adds a new review to the repository.
         /// </summary>
-        public async Task<Review> AddReviewAsync(Review review)
+        public async Task AddReviewAsync(Review review)
         {
             review.ReviewDate = DateTime.Now;
             await _reviewRepository.AddAsync(review);
-            return review;
         }
 
         /// <summary>

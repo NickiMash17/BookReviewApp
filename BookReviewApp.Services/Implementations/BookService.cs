@@ -40,10 +40,9 @@ namespace BookReviewApp.Services.Implementations
         /// <summary>
         /// Adds a new book to the repository.
         /// </summary>
-        public async Task<Book> AddBookAsync(Book book)
+        public async Task AddBookAsync(Book book)
         {
             await _bookRepository.AddAsync(book);
-            return book;
         }
 
         /// <summary>

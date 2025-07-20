@@ -30,11 +30,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Register MongoDB Repositories
-// MongoDB repositories (now enabled for demo)
-builder.Services.AddScoped<IRepository<Book>, MongoBookRepository>();
-builder.Services.AddScoped<IRepository<Author>, MongoAuthorRepository>();
+// MongoDB repositories (commented out - using EF Core only for now)
+// builder.Services.AddScoped<IRepository<Book>, MongoBookRepository>();
+// builder.Services.AddScoped<IRepository<Author>, MongoAuthorRepository>();
 
-// Restore fallback EF Core repository registration for other entities
+// Use EF Core repositories for all entities
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IAuthorService, AuthorService>();

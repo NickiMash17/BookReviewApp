@@ -150,17 +150,19 @@
         </div>
     </footer>
 
+    <!-- Trademark Badge - positioned to not overlap footer -->
+    <div class="trademark-badge">
+        <span class="trademark-icon"><i class="bi bi-book"></i></span>
+        &copy; @DateTime.Now.Year Nicolette Mashaba™
+        <a href="https://www.linkedin.com/in/nicolette-mashaba-b094a5221" target="_blank" aria-label="LinkedIn" class="trademark-link"><i class="bi bi-linkedin"></i></a>
+        <a href="https://nickimash.vercel.app/" target="_blank" aria-label="Portfolio" class="trademark-link"><i class="bi bi-globe2"></i></a>
+        <a href="mailto:nene171408@gmail.com" aria-label="Email" class="trademark-link"><i class="bi bi-envelope"></i></a>
+    </div>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
-<div class="trademark-badge">
-    <span class="trademark-icon"><i class="bi bi-book"></i></span>
-    &copy; @DateTime.Now.Year Nicolette Mashaba™
-    <a href="https://www.linkedin.com/in/nicolette-mashaba-b094a5221" target="_blank" aria-label="LinkedIn" class="trademark-link"><i class="bi bi-linkedin"></i></a>
-    <a href="https://nickimash.vercel.app/" target="_blank" aria-label="Portfolio" class="trademark-link"><i class="bi bi-globe2"></i></a>
-    <a href="mailto:nene171408@gmail.com" aria-label="Email" class="trademark-link"><i class="bi bi-envelope"></i></a>
-</div>
 </html>

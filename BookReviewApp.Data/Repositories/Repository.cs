@@ -1,5 +1,6 @@
 using BookReviewApp.Data.Context;
 using BookReviewApp.Domain.Interfaces;
+using BookReviewApp.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
@@ -8,7 +9,7 @@ namespace BookReviewApp.Data.Repositories
     /// <summary>
     /// Generic repository for CRUD operations on entities.
     /// </summary>
-    public class Repository<T> : IRepository<T> where T : BaseEntity
+    public class Repository<T> : IRepository<T> where T : class
     {
         protected readonly ApplicationDbContext _context;
         protected readonly DbSet<T> _dbSet;

@@ -1,8 +1,10 @@
 using BookReviewApp.Services.Interfaces;
+using BookReviewApp.Domain.Models;
+using BookReviewApp.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using System.ComponentModel.DataAnnotations;
-using Ganss.XSS;
+using System.Web;
 
 namespace BookReviewApp.Web.Controllers
 {
@@ -54,8 +56,10 @@ namespace BookReviewApp.Web.Controllers
         {
             if (!ModelState.IsValid)
                 return View(model);
-            var sanitizer = new HtmlSanitizer();
-            var sanitizedComment = sanitizer.Sanitize(model.Comment);
+            
+            // Simple HTML encoding for security
+            var sanitizedComment = HttpUtility.HtmlEncode(model.Comment ?? string.Empty);
+            
             var review = new Review
             {
                 Rating = model.Rating,
@@ -69,16 +73,5 @@ namespace BookReviewApp.Web.Controllers
             TempData["SuccessMessage"] = "Review submitted and pending approval.";
             return RedirectToAction("Details", "Books", new { id = model.BookId });
         }
-    }
-
-    public class ReviewViewModel
-    {
-        [Required]
-        [Range(1, 5)]
-        public int Rating { get; set; }
-        [StringLength(1000)]
-        public string? Comment { get; set; }
-        [Required]
-        public string BookId { get; set; } = string.Empty;
     }
 } 
