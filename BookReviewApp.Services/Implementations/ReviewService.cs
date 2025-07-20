@@ -9,6 +9,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BookReviewApp.Services.Implementations
 {
+    /// <summary>
+    /// Service for managing review-related operations.
+    /// </summary>
     public class ReviewService : IReviewService
     {
         private readonly IRepository<Review> _reviewRepository;
@@ -18,11 +21,17 @@ namespace BookReviewApp.Services.Implementations
             _reviewRepository = reviewRepository ?? throw new ArgumentNullException(nameof(reviewRepository));
         }
 
+        /// <summary>
+        /// Gets all reviews.
+        /// </summary>
         public async Task<IEnumerable<Review>> GetAllReviewsAsync()
         {
             return await _reviewRepository.GetAllAsync();
         }
 
+        /// <summary>
+        /// Gets a review by its unique identifier.
+        /// </summary>
         public async Task<Review?> GetReviewByIdAsync(string id)
         {
             return await _reviewRepository.GetByIdAsync(id);
@@ -37,6 +46,9 @@ namespace BookReviewApp.Services.Implementations
                 filter: query => query.Where(r => r.BookId == bookId && r.IsApproved));
         }
 
+        /// <summary>
+        /// Adds a new review to the repository.
+        /// </summary>
         public async Task<Review> AddReviewAsync(Review review)
         {
             review.ReviewDate = DateTime.Now;
@@ -44,11 +56,17 @@ namespace BookReviewApp.Services.Implementations
             return review;
         }
 
+        /// <summary>
+        /// Updates an existing review in the repository.
+        /// </summary>
         public async Task UpdateReviewAsync(Review review)
         {
             await _reviewRepository.UpdateAsync(review);
         }
 
+        /// <summary>
+        /// Deletes a review by its unique identifier.
+        /// </summary>
         public async Task DeleteReviewAsync(string id)
         {
             await _reviewRepository.DeleteAsync(id);

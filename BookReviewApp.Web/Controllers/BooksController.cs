@@ -7,10 +7,13 @@ using BookReviewApp.Domain.Models;
 using BookReviewApp.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
+using BookReviewApp.Web.Utilities;
 
 namespace BookReviewApp.Web.Controllers
 {
-    public class BooksController : Controller
+    [Authorize]
+    public class BooksController : BaseController
     {
         private readonly IBookService _bookService;
         private readonly IAuthorService _authorService;
@@ -33,9 +36,9 @@ namespace BookReviewApp.Web.Controllers
                 var books = await _bookService.GetAllBooksWithAuthorsAsync();
                 return View(books);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return View("Error", new ErrorViewModel { RequestId = "An error occurred while loading books." });
+                return HandleError(ex, "An error occurred while loading books.");
             }
         }
 
@@ -58,12 +61,13 @@ namespace BookReviewApp.Web.Controllers
                 
                 return View(book);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return View("Error", new ErrorViewModel { RequestId = "An error occurred while loading book details." });
+                return HandleError(ex, "An error occurred while loading book details.");
             }
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create()
         {
             try
@@ -72,13 +76,14 @@ namespace BookReviewApp.Web.Controllers
                 ViewBag.Authors = authors;
                 return View();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return View("Error", new ErrorViewModel { RequestId = "An error occurred while loading the create form." });
+                return HandleError(ex, "An error occurred while loading the create form.");
             }
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Book book, IFormFile? CoverImage)
         {
@@ -90,24 +95,16 @@ namespace BookReviewApp.Web.Controllers
                     // Handle cover image upload
                     if (CoverImage != null && CoverImage.Length > 0)
                     {
-                        var allowedTypes = new[] { ".jpg", ".jpeg", ".png", ".webp" };
-                        var ext = Path.GetExtension(CoverImage.FileName).ToLowerInvariant();
-                        if (!allowedTypes.Contains(ext))
+                        if (!FileUploadHelper.IsValidImage(CoverImage, out var errorMessage))
                         {
-                            ModelState.AddModelError("", "Only JPG, PNG, or WEBP images are allowed.");
-                            authors = await _authorService.GetAllAuthorsAsync();
-                            ViewBag.Authors = authors;
-                            return View(book);
-                        }
-                        if (CoverImage.Length > 2 * 1024 * 1024)
-                        {
-                            ModelState.AddModelError("", "Image size must be less than 2MB.");
+                            ModelState.AddModelError("", errorMessage);
                             authors = await _authorService.GetAllAuthorsAsync();
                             ViewBag.Authors = authors;
                             return View(book);
                         }
                         var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/books");
                         Directory.CreateDirectory(uploadsFolder);
+                        var ext = Path.GetExtension(CoverImage.FileName).ToLowerInvariant();
                         var fileName = $"book_{DateTime.Now.Ticks}{ext}";
                         var filePath = Path.Combine(uploadsFolder, fileName);
                         using (var stream = new FileStream(filePath, FileMode.Create))
@@ -134,6 +131,7 @@ namespace BookReviewApp.Web.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(string id)
         {
             try
@@ -148,13 +146,14 @@ namespace BookReviewApp.Web.Controllers
                 ViewBag.Authors = authors;
                 return View(book);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return View("Error", new ErrorViewModel { RequestId = "An error occurred while loading the edit form." });
+                return HandleError(ex, "An error occurred while loading the edit form.");
             }
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, Book book)
         {
@@ -185,6 +184,7 @@ namespace BookReviewApp.Web.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(string id)
         {
             try
@@ -197,13 +197,14 @@ namespace BookReviewApp.Web.Controllers
 
                 return View(book);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return View("Error", new ErrorViewModel { RequestId = "An error occurred while loading the delete confirmation." });
+                return HandleError(ex, "An error occurred while loading the delete confirmation.");
             }
         }
 
         [HttpPost, ActionName("Delete")]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {

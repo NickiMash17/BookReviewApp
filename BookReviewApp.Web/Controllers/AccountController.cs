@@ -10,10 +10,12 @@ using System.IO;
 using System.Web;
 using System.Security.Cryptography;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
+using BookReviewApp.Web.Utilities;
 
 namespace BookReviewApp.Web.Controllers
 {
-    public class AccountController : Controller
+    public class AccountController : BaseController
     {
         private readonly IUserService _userService;
         public AccountController(IUserService userService)
@@ -31,35 +33,42 @@ namespace BookReviewApp.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            if (!ModelState.IsValid)
-                return View(model);
+            try
+            {
+                if (!ModelState.IsValid)
+                    return View(model);
 
-            if (await _userService.EmailExistsAsync(model.Email))
-            {
-                ModelState.AddModelError("Email", "Email is already registered.");
-                return View(model);
-            }
-            if (await _userService.UsernameExistsAsync(model.Username))
-            {
-                ModelState.AddModelError("Username", "Username is already taken.");
-                return View(model);
-            }
+                if (await _userService.EmailExistsAsync(model.Email))
+                {
+                    ModelState.AddModelError("Email", "Email is already registered.");
+                    return View(model);
+                }
+                if (await _userService.UsernameExistsAsync(model.Username))
+                {
+                    ModelState.AddModelError("Username", "Username is already taken.");
+                    return View(model);
+                }
 
-            var user = new User
+                var user = new User
+                {
+                    Email = model.Email,
+                    Username = model.Username,
+                    PasswordHash = model.Password, // Will be hashed in service
+                    FirstName = model.FirstName,
+                    LastName = model.LastName
+                };
+                await _userService.AddUserAsync(user);
+                // Generate confirmation link for demo
+                var token = GenerateEmailToken(user);
+                var url = Url.Action("ConfirmEmail", "Account", new { userId = user.UserId, token = token }, protocol: Request.Scheme);
+                ViewBag.ConfirmationUrl = url;
+                TempData["SuccessMessage"] = "Registration successful! Please confirm your email.";
+                return View("RegistrationSuccess");
+            }
+            catch (Exception ex)
             {
-                Email = model.Email,
-                Username = model.Username,
-                PasswordHash = model.Password, // Will be hashed in service
-                FirstName = model.FirstName,
-                LastName = model.LastName
-            };
-            await _userService.AddUserAsync(user);
-            // Generate confirmation link for demo
-            var token = GenerateEmailToken(user);
-            var url = Url.Action("ConfirmEmail", "Account", new { userId = user.UserId, token = token }, protocol: Request.Scheme);
-            ViewBag.ConfirmationUrl = url;
-            TempData["SuccessMessage"] = "Registration successful! Please confirm your email.";
-            return View("RegistrationSuccess");
+                return HandleError(ex, "An error occurred during registration.");
+            }
         }
 
         [HttpGet]
@@ -108,11 +117,10 @@ namespace BookReviewApp.Web.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> Profile()
         {
-            if (!User.Identity?.IsAuthenticated ?? true)
-                return RedirectToAction("Login");
             var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value;
             var user = await _userService.GetUserByIdAsync(userId);
             if (user == null)
@@ -132,111 +140,122 @@ namespace BookReviewApp.Web.Controllers
             return View(model);
         }
 
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Profile(ProfileViewModel model, IFormFile? profileImage)
         {
-            if (!User.Identity?.IsAuthenticated ?? true)
-                return RedirectToAction("Login");
-            if (!ModelState.IsValid)
-                return View(model);
-            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value;
-            var user = await _userService.GetUserByIdAsync(userId);
-            if (user == null)
-                return RedirectToAction("Login");
-            // Check for email/username conflicts (if changed)
-            if (user.Email != model.Email && await _userService.EmailExistsAsync(model.Email))
+            try
             {
-                ModelState.AddModelError("Email", "Email is already registered.");
-                return View(model);
-            }
-            if (user.Username != model.Username && await _userService.UsernameExistsAsync(model.Username))
-            {
-                ModelState.AddModelError("Username", "Username is already taken.");
-                return View(model);
-            }
-            user.Email = model.Email;
-            user.Username = model.Username;
-            user.FirstName = model.FirstName;
-            user.LastName = model.LastName;
-            // Handle profile image upload with validation
-            if (profileImage != null && profileImage.Length > 0)
-            {
-                var allowedTypes = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
-                var ext = Path.GetExtension(profileImage.FileName).ToLowerInvariant();
-                if (!allowedTypes.Contains(ext))
+                if (!ModelState.IsValid)
+                    return View(model);
+                var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value;
+                var user = await _userService.GetUserByIdAsync(userId);
+                if (user == null)
+                    return RedirectToAction("Login");
+                // Check for email/username conflicts (if changed)
+                if (user.Email != model.Email && await _userService.EmailExistsAsync(model.Email))
                 {
-                    ModelState.AddModelError("", "Only JPG, PNG, GIF, or WEBP images are allowed.");
+                    ModelState.AddModelError("Email", "Email is already registered.");
                     return View(model);
                 }
-                if (profileImage.Length > 2 * 1024 * 1024)
+                if (user.Username != model.Username && await _userService.UsernameExistsAsync(model.Username))
                 {
-                    ModelState.AddModelError("", "Image size must be less than 2MB.");
+                    ModelState.AddModelError("Username", "Username is already taken.");
                     return View(model);
                 }
-                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/avatars");
-                Directory.CreateDirectory(uploadsFolder);
-                var fileName = $"user_{userId}_{DateTime.Now.Ticks}{ext}";
-                var filePath = Path.Combine(uploadsFolder, fileName);
-                using (var stream = new FileStream(filePath, FileMode.Create))
+                user.Email = model.Email;
+                user.Username = model.Username;
+                user.FirstName = model.FirstName;
+                user.LastName = model.LastName;
+                // Handle profile image upload with validation
+                if (profileImage != null && profileImage.Length > 0)
                 {
-                    await profileImage.CopyToAsync(stream);
+                    if (!FileUploadHelper.IsValidImage(profileImage, out var errorMessage))
+                    {
+                        ModelState.AddModelError("", errorMessage);
+                        return View(model);
+                    }
+                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/avatars");
+                    Directory.CreateDirectory(uploadsFolder);
+                    var ext = Path.GetExtension(profileImage.FileName).ToLowerInvariant();
+                    var fileName = $"user_{userId}_{DateTime.Now.Ticks}{ext}";
+                    var filePath = Path.Combine(uploadsFolder, fileName);
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await profileImage.CopyToAsync(stream);
+                    }
+                    user.ProfilePictureUrl = $"/images/avatars/{fileName}";
                 }
-                user.ProfilePictureUrl = $"/images/avatars/{fileName}";
+                await _userService.UpdateUserAsync(user);
+                await SignInUser(user, rememberMe: false); // Refresh claims for avatar
+                TempData["SuccessMessage"] = "Profile updated successfully!";
+                return RedirectToAction("Profile");
             }
-            await _userService.UpdateUserAsync(user);
-            await SignInUser(user, rememberMe: false); // Refresh claims for avatar
-            TempData["SuccessMessage"] = "Profile updated successfully!";
-            return RedirectToAction("Profile");
+            catch (Exception ex)
+            {
+                return HandleError(ex, "An error occurred while updating your profile.");
+            }
         }
 
+        [Authorize]
         [HttpGet]
         public IActionResult ChangePassword()
         {
-            if (!User.Identity?.IsAuthenticated ?? true)
-                return RedirectToAction("Login");
             return View();
         }
 
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
-            if (!User.Identity?.IsAuthenticated ?? true)
-                return RedirectToAction("Login");
-            if (!ModelState.IsValid)
-                return View(model);
-            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value;
-            var user = await _userService.GetUserByIdAsync(userId);
-            if (user == null)
-                return RedirectToAction("Login");
-            var valid = await _userService.ValidateCredentialsAsync(user.Email, model.CurrentPassword);
-            if (!valid)
+            try
             {
-                ModelState.AddModelError("CurrentPassword", "Current password is incorrect.");
-                return View(model);
+                if (!ModelState.IsValid)
+                    return View(model);
+                var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value;
+                var user = await _userService.GetUserByIdAsync(userId);
+                if (user == null)
+                    return RedirectToAction("Login");
+                var valid = await _userService.ValidateCredentialsAsync(user.Email, model.CurrentPassword);
+                if (!valid)
+                {
+                    ModelState.AddModelError("CurrentPassword", "Current password is incorrect.");
+                    return View(model);
+                }
+                user.PasswordHash = new Microsoft.AspNetCore.Identity.PasswordHasher<BookReviewApp.Domain.Models.User>().HashPassword(user, model.NewPassword);
+                await _userService.UpdateUserAsync(user);
+                TempData["SuccessMessage"] = "Password changed successfully!";
+                return RedirectToAction("Profile");
             }
-            user.PasswordHash = new Microsoft.AspNetCore.Identity.PasswordHasher<BookReviewApp.Domain.Models.User>().HashPassword(user, model.NewPassword);
-            await _userService.UpdateUserAsync(user);
-            TempData["SuccessMessage"] = "Password changed successfully!";
-            return RedirectToAction("Profile");
+            catch (Exception ex)
+            {
+                return HandleError(ex, "An error occurred while changing your password.");
+            }
         }
 
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RemoveAvatar()
         {
-            if (!User.Identity?.IsAuthenticated ?? true)
-                return RedirectToAction("Login");
-            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value;
-            var user = await _userService.GetUserByIdAsync(userId);
-            if (user == null)
-                return RedirectToAction("Login");
-            user.ProfilePictureUrl = null;
-            await _userService.UpdateUserAsync(user);
-            await SignInUser(user, rememberMe: false);
-            TempData["SuccessMessage"] = "Avatar removed.";
-            return RedirectToAction("Profile");
+            try
+            {
+                var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value;
+                var user = await _userService.GetUserByIdAsync(userId);
+                if (user == null)
+                    return RedirectToAction("Login");
+                user.ProfilePictureUrl = null;
+                await _userService.UpdateUserAsync(user);
+                await SignInUser(user, rememberMe: false);
+                TempData["SuccessMessage"] = "Avatar removed.";
+                return RedirectToAction("Profile");
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex, "An error occurred while removing your avatar.");
+            }
         }
 
         [HttpGet]
@@ -249,16 +268,23 @@ namespace BookReviewApp.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
         {
-            if (!ModelState.IsValid)
-                return View(model);
-            var user = await _userService.GetUserByEmailAsync(model.Email);
-            if (user == null)
+            try
             {
-                TempData["SuccessMessage"] = "If this email exists, you will receive a reset link.";
-                return RedirectToAction("Login");
+                if (!ModelState.IsValid)
+                    return View(model);
+                var user = await _userService.GetUserByEmailAsync(model.Email);
+                if (user == null)
+                {
+                    TempData["SuccessMessage"] = "If this email exists, you will receive a reset link.";
+                    return RedirectToAction("Login");
+                }
+                // For demo: redirect to ResetPassword with email as query param
+                return RedirectToAction("ResetPassword", new { email = model.Email });
             }
-            // For demo: redirect to ResetPassword with email as query param
-            return RedirectToAction("ResetPassword", new { email = model.Email });
+            catch (Exception ex)
+            {
+                return HandleError(ex, "An error occurred while processing your password reset request.");
+            }
         }
 
         [HttpGet]
@@ -274,19 +300,26 @@ namespace BookReviewApp.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
         {
-            if (!ModelState.IsValid)
-                return View(model);
-            var user = await _userService.GetUserByEmailAsync(model.Email);
-            if (user == null)
+            try
             {
-                ModelState.AddModelError("Email", "No user found with this email.");
-                return View(model);
+                if (!ModelState.IsValid)
+                    return View(model);
+                var user = await _userService.GetUserByEmailAsync(model.Email);
+                if (user == null)
+                {
+                    ModelState.AddModelError("Email", "No user found with this email.");
+                    return View(model);
+                }
+                // Hash and update password
+                user.PasswordHash = new Microsoft.AspNetCore.Identity.PasswordHasher<BookReviewApp.Domain.Models.User>().HashPassword(user, model.NewPassword);
+                await _userService.UpdateUserAsync(user);
+                TempData["SuccessMessage"] = "Password reset successful! Please log in.";
+                return RedirectToAction("Login");
             }
-            // Hash and update password
-            user.PasswordHash = new Microsoft.AspNetCore.Identity.PasswordHasher<BookReviewApp.Domain.Models.User>().HashPassword(user, model.NewPassword);
-            await _userService.UpdateUserAsync(user);
-            TempData["SuccessMessage"] = "Password reset successful! Please log in.";
-            return RedirectToAction("Login");
+            catch (Exception ex)
+            {
+                return HandleError(ex, "An error occurred while resetting your password.");
+            }
         }
 
         [HttpGet]
@@ -306,10 +339,10 @@ namespace BookReviewApp.Web.Controllers
                 TempData["SuccessMessage"] = "Email confirmed successfully! You can now log in.";
                 return RedirectToAction("Login");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 TempData["ErrorMessage"] = "An error occurred while confirming your email.";
-                return RedirectToAction("Login");
+                return HandleError(ex, "An error occurred while confirming your email.");
             }
         }
 

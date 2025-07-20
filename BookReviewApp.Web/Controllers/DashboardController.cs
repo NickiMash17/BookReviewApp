@@ -1,10 +1,12 @@
 using BookReviewApp.Services.Interfaces;
 using BookReviewApp.Web.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BookReviewApp.Web.Controllers
 {
-    public class DashboardController : Controller
+    [Authorize(Roles = "Admin")]
+    public class DashboardController : BaseController
     {
         private readonly IBookService _bookService;
         private readonly IAuthorService _authorService;
@@ -75,7 +77,7 @@ namespace BookReviewApp.Web.Controllers
 
                 return View();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 // Fallback values
                 ViewBag.TotalBooks = 0;
@@ -86,8 +88,7 @@ namespace BookReviewApp.Web.Controllers
                 ViewBag.RecentReviews = new List<object>();
                 ViewBag.PopularAuthors = new List<object>();
                 ViewBag.MonthlyStats = new List<object>();
-
-                return View();
+                return HandleError(ex, "An error occurred while loading the dashboard.");
             }
         }
     }

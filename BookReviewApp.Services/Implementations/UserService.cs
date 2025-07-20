@@ -9,6 +9,9 @@ using Microsoft.AspNetCore.Identity;
 
 namespace BookReviewApp.Services.Implementations
 {
+    /// <summary>
+    /// Service for managing user-related operations.
+    /// </summary>
     public class UserService : IUserService
     {
         private readonly IRepository<User> _userRepository;
@@ -19,11 +22,17 @@ namespace BookReviewApp.Services.Implementations
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
         }
 
+        /// <summary>
+        /// Gets all users.
+        /// </summary>
         public async Task<IEnumerable<User>> GetAllUsersAsync()
         {
             return await _userRepository.GetAllAsync();
         }
 
+        /// <summary>
+        /// Gets a user by their unique identifier.
+        /// </summary>
         public async Task<User?> GetUserByIdAsync(string id)
         {
             return await _userRepository.GetByIdAsync(id);
@@ -43,6 +52,9 @@ namespace BookReviewApp.Services.Implementations
             return users.FirstOrDefault();
         }
 
+        /// <summary>
+        /// Adds a new user to the repository.
+        /// </summary>
         public async Task<User> AddUserAsync(User user)
         {
             // Hash the password before saving using PasswordHasher
@@ -51,11 +63,17 @@ namespace BookReviewApp.Services.Implementations
             return user;
         }
 
+        /// <summary>
+        /// Updates an existing user in the repository.
+        /// </summary>
         public async Task UpdateUserAsync(User user)
         {
             await _userRepository.UpdateAsync(user);
         }
 
+        /// <summary>
+        /// Deletes a user by their unique identifier.
+        /// </summary>
         public async Task DeleteUserAsync(string id)
         {
             await _userRepository.DeleteAsync(id);

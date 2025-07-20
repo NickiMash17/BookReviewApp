@@ -12,7 +12,7 @@ using System;
 
 namespace BookReviewApp.Web.Controllers;
 
-public class HomeController : Controller
+public class HomeController : BaseController
 {
     private readonly IBookService _bookService;
     private readonly IAuthorService _authorService;
@@ -52,7 +52,7 @@ public class HomeController : Controller
 
             return View();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             // Fallback values if there's an error
             ViewBag.TotalBooks = 0;
@@ -60,8 +60,7 @@ public class HomeController : Controller
             ViewBag.TotalReviews = 0;
             ViewBag.AverageRating = "0.0";
             ViewBag.FeaturedBooks = new List<object>();
-
-            return View();
+            return HandleError(ex, "An error occurred while loading the home page.");
         }
     }
 

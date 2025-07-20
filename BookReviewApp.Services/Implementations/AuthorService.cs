@@ -9,6 +9,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BookReviewApp.Services.Implementations
 {
+    /// <summary>
+    /// Service for managing author-related operations.
+    /// </summary>
     public class AuthorService : IAuthorService
     {
         private readonly IRepository<Author> _authorRepository;
@@ -18,27 +21,42 @@ namespace BookReviewApp.Services.Implementations
             _authorRepository = authorRepository ?? throw new ArgumentNullException(nameof(authorRepository));
         }
 
+        /// <summary>
+        /// Gets all authors.
+        /// </summary>
         public async Task<IEnumerable<Author>> GetAllAuthorsAsync()
         {
             return await _authorRepository.GetAllAsync();
         }
 
+        /// <summary>
+        /// Gets an author by their unique identifier.
+        /// </summary>
         public async Task<Author?> GetAuthorByIdAsync(string id)
         {
             return await _authorRepository.GetByIdAsync(id);
         }
 
+        /// <summary>
+        /// Adds a new author to the repository.
+        /// </summary>
         public async Task<Author> AddAuthorAsync(Author author)
         {
             await _authorRepository.AddAsync(author);
             return author;
         }
 
+        /// <summary>
+        /// Updates an existing author in the repository.
+        /// </summary>
         public async Task UpdateAuthorAsync(Author author)
         {
             await _authorRepository.UpdateAsync(author);
         }
 
+        /// <summary>
+        /// Deletes an author by their unique identifier.
+        /// </summary>
         public async Task DeleteAuthorAsync(string id)
         {
             await _authorRepository.DeleteAsync(id);

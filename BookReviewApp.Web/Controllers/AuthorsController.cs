@@ -6,10 +6,12 @@ using BookReviewApp.Services.Interfaces;
 using BookReviewApp.Domain.Models;
 using BookReviewApp.Web.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BookReviewApp.Web.Controllers
 {
-    public class AuthorsController : Controller
+    [Authorize]
+    public class AuthorsController : BaseController
     {
         private readonly IAuthorService _authorService;
         private readonly IBookService _bookService;
@@ -27,9 +29,9 @@ namespace BookReviewApp.Web.Controllers
                 var authors = await _authorService.GetAllAuthorsAsync();
                 return View(authors);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return View("Error", new ErrorViewModel { RequestId = "An error occurred while loading authors." });
+                return HandleError(ex, "An error occurred while loading authors.");
             }
         }
 
@@ -49,18 +51,20 @@ namespace BookReviewApp.Web.Controllers
 
                 return View(author);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return View("Error", new ErrorViewModel { RequestId = "An error occurred while loading author details." });
+                return HandleError(ex, "An error occurred while loading author details.");
             }
         }
 
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Author author)
         {
@@ -75,13 +79,14 @@ namespace BookReviewApp.Web.Controllers
 
                 return View(author);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 ModelState.AddModelError("", "An error occurred while creating the author.");
-                return View(author);
+                return HandleError(ex, "An error occurred while creating the author.");
             }
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(string id)
         {
             try
@@ -94,13 +99,14 @@ namespace BookReviewApp.Web.Controllers
 
                 return View(author);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return View("Error", new ErrorViewModel { RequestId = "An error occurred while loading the edit form." });
+                return HandleError(ex, "An error occurred while loading the edit form.");
             }
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, Author author)
         {
@@ -120,13 +126,14 @@ namespace BookReviewApp.Web.Controllers
 
                 return View(author);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 ModelState.AddModelError("", "An error occurred while updating the author.");
-                return View(author);
+                return HandleError(ex, "An error occurred while updating the author.");
             }
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(string id)
         {
             try
@@ -143,13 +150,14 @@ namespace BookReviewApp.Web.Controllers
 
                 return View(author);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return View("Error", new ErrorViewModel { RequestId = "An error occurred while loading the delete confirmation." });
+                return HandleError(ex, "An error occurred while loading the delete confirmation.");
             }
         }
 
         [HttpPost, ActionName("Delete")]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
@@ -159,10 +167,10 @@ namespace BookReviewApp.Web.Controllers
                 TempData["SuccessMessage"] = "Author deleted successfully!";
                 return RedirectToAction(nameof(Index));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 TempData["ErrorMessage"] = "An error occurred while deleting the author.";
-                return RedirectToAction(nameof(Index));
+                return HandleError(ex, "An error occurred while deleting the author.");
             }
         }
     }

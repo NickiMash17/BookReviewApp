@@ -5,7 +5,10 @@ using System.Linq.Expressions;
 
 namespace BookReviewApp.Data.Repositories
 {
-    public class Repository<T> : IRepository<T> where T : class
+    /// <summary>
+    /// Generic repository for CRUD operations on entities.
+    /// </summary>
+    public class Repository<T> : IRepository<T> where T : BaseEntity
     {
         protected readonly ApplicationDbContext _context;
         protected readonly DbSet<T> _dbSet;
@@ -16,6 +19,9 @@ namespace BookReviewApp.Data.Repositories
             _dbSet = context.Set<T>();
         }
 
+        /// <summary>
+        /// Gets all entities of type T.
+        /// </summary>
         public virtual async Task<IEnumerable<T>> GetAllAsync(
             Func<IQueryable<T>, IQueryable<T>>? include = null,
             Func<IQueryable<T>, IQueryable<T>>? filter = null)
@@ -35,6 +41,9 @@ namespace BookReviewApp.Data.Repositories
             return await query.ToListAsync();
         }
 
+        /// <summary>
+        /// Gets an entity by its unique identifier.
+        /// </summary>
         public virtual async Task<T?> GetByIdAsync(string id, Func<IQueryable<T>, IQueryable<T>>? include = null)
         {
             var query = _dbSet.AsQueryable();
@@ -52,18 +61,27 @@ namespace BookReviewApp.Data.Repositories
             return null;
         }
 
+        /// <summary>
+        /// Adds a new entity to the repository.
+        /// </summary>
         public virtual async Task AddAsync(T entity)
         {
             await _dbSet.AddAsync(entity);
             await _context.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Updates an existing entity in the repository.
+        /// </summary>
         public virtual async Task UpdateAsync(T entity)
         {
             _dbSet.Update(entity);
             await _context.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Deletes an entity by its unique identifier.
+        /// </summary>
         public virtual async Task DeleteAsync(string id)
         {
             var entity = await GetByIdAsync(id);
