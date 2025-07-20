@@ -8,45 +8,32 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Book Review App</title>
+    <meta name="description" content="Discover, review, and share your favorite books with our community of book lovers." />
     <link rel="icon" type="image/x-icon" href="~/favicon.ico" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/BookReviewApp.Web.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Toast notifications CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     @await RenderSectionAsync("Styles", required: false)
-    <style>
-        body { background: #f8f9fa; }
-        .navbar-brand img { height: 40px; margin-right: 10px; }
-        .navbar { box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-        .footer {
-            background: #222; color: #fff; padding: 1.5rem 0; font-size: 1rem;
-        }
-        .footer a { color: #ffc107; text-decoration: none; margin: 0 0.5rem; }
-        .footer a:hover { color: #fff; text-decoration: underline; }
-        .footer .social-icons i { font-size: 1.3rem; margin: 0 0.3rem; }
-    </style>
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom sticky-top" aria-label="Main navigation">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top" aria-label="Main navigation">
             <div class="container">
                 <a class="navbar-brand d-flex align-items-center" asp-controller="Home" asp-action="Index">
-                    <img src="/images/placeholder.jpg" alt="Book Review App Logo" />
-                    <span class="fw-bold">Book Review App</span>
+                    <img src="/images/placeholder.jpg" alt="Book Review App Logo" class="me-2" style="height: 40px; width: 40px; object-fit: cover; border-radius: 8px;" />
+                    <span class="fw-bold fs-5">Book Review App</span>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="mainNavbar">
-                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-controller="Home" asp-action="Index" aria-label="Home">
-                                <i class="bi bi-house"></i> Home
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Dashboard" asp-action="Index" aria-label="Dashboard">
-                                <i class="bi bi-graph-up"></i> Dashboard
+                                <i class="bi bi-house-door"></i> Home
                             </a>
                         </li>
                         <li class="nav-item">
@@ -60,10 +47,20 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Privacy" aria-label="Privacy">
-                                <i class="bi bi-shield"></i> Privacy
+                            <a class="nav-link text-dark" asp-controller="Reviews" asp-action="Index" aria-label="Reviews">
+                                <i class="bi bi-star"></i> Reviews
                             </a>
                         </li>
+                        @if (User.Identity?.IsAuthenticated ?? false)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Dashboard" asp-action="Index" aria-label="Dashboard">
+                                    <i class="bi bi-graph-up"></i> Dashboard
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                         @if (User.Identity?.IsAuthenticated ?? false)
                         {
                             var avatarUrl = "/images/placeholder.jpg";
@@ -79,7 +76,7 @@
                             {
                                 <li class="nav-item">
                                     <a class="nav-link text-danger fw-bold" asp-controller="Admin" asp-action="Index">
-                                        <i class="bi bi-shield-lock"></i> Admin Dashboard
+                                        <i class="bi bi-shield-lock"></i> Admin
                                     </a>
                                 </li>
                             }
@@ -88,11 +85,12 @@
                                     <img src="@avatarUrl" alt="Avatar" class="rounded-circle me-2" style="width:32px;height:32px;object-fit:cover;border:2px solid #e0e7ff;background:#f8f9fa;" />
                                     <span>@User.Identity.Name</span>
                                 </a>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile">Profile</a></li>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-lg" aria-labelledby="userDropdown">
+                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile"><i class="bi bi-person"></i> Profile</a></li>
+                                    <li><hr class="dropdown-divider"></li>
                                     <li>
                                         <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
-                                            <button type="submit" class="dropdown-item">Logout</button>
+                                            <button type="submit" class="dropdown-item text-danger"><i class="bi bi-box-arrow-right"></i> Logout</button>
                                         </form>
                                     </li>
                                 </ul>
@@ -104,7 +102,7 @@
                                 <a class="nav-link text-dark" asp-controller="Account" asp-action="Login"><i class="bi bi-box-arrow-in-right"></i> Login</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Register"><i class="bi bi-person-plus"></i> Register</a>
+                                <a class="btn btn-primary ms-2" asp-controller="Account" asp-action="Register"><i class="bi bi-person-plus"></i> Register</a>
                             </li>
                         }
                     </ul>
@@ -113,26 +111,48 @@
         </nav>
     </header>
 
-    <main role="main" class="container pb-3">
+    <main role="main" class="container py-4">
+        <!-- Toast notifications container -->
+        <div id="toast-container" class="position-fixed top-0 end-0 p-3" style="z-index: 1055;"></div>
+        
         @if (TempData["SuccessMessage"] != null)
         {
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="bi bi-check-circle"></i> @TempData["SuccessMessage"]
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         }
         @if (TempData["ErrorMessage"] != null)
         {
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="bi bi-exclamation-triangle"></i> @TempData["ErrorMessage"]
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         }
         @RenderBody()
     </main>
 
+    <footer class="footer-blue mt-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0">&copy; @DateTime.Now.Year Book Review App. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <div class="social-icons">
+                        <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="bi bi-twitter"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+                        <a href="#" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
