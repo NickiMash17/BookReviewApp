@@ -12,7 +12,6 @@ using BookReviewApp.Web.Utilities;
 
 namespace BookReviewApp.Web.Controllers
 {
-    [Authorize]
     public class BooksController : BaseController
     {
         private readonly IBookService _bookService;
@@ -29,6 +28,7 @@ namespace BookReviewApp.Web.Controllers
             _reviewService = reviewService;
         }
 
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             try
@@ -68,7 +68,7 @@ namespace BookReviewApp.Web.Controllers
             }
         }
 
-        [Authorize] // Changed from [Authorize(Roles = "Admin")] for development
+        [AllowAnonymous] // Allow anonymous access for development
         public async Task<IActionResult> Create()
         {
             try
@@ -84,7 +84,7 @@ namespace BookReviewApp.Web.Controllers
         }
 
         [HttpPost]
-        [Authorize] // Changed from [Authorize(Roles = "Admin")] for development
+        [AllowAnonymous] // Allow anonymous access for development
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Book book, IFormFile? CoverImage)
         {
@@ -132,7 +132,7 @@ namespace BookReviewApp.Web.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin")]
+        [AllowAnonymous] // Allow anonymous access for development
         public async Task<IActionResult> Edit(string id)
         {
             try
@@ -154,7 +154,7 @@ namespace BookReviewApp.Web.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [AllowAnonymous] // Allow anonymous access for development
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, Book book)
         {

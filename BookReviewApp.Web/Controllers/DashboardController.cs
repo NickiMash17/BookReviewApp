@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace BookReviewApp.Web.Controllers
 {
-    [Authorize] // Allow all authenticated users to access dashboard for development
     public class DashboardController : BaseController
     {
         private readonly IBookService _bookService;
@@ -22,6 +21,7 @@ namespace BookReviewApp.Web.Controllers
             _reviewService = reviewService;
         }
 
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             try

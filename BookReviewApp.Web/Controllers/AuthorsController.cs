@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace BookReviewApp.Web.Controllers
 {
-    [Authorize]
     public class AuthorsController : BaseController
     {
         private readonly IAuthorService _authorService;
@@ -22,6 +21,7 @@ namespace BookReviewApp.Web.Controllers
             _bookService = bookService;
         }
 
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             try
@@ -35,6 +35,7 @@ namespace BookReviewApp.Web.Controllers
             }
         }
 
+        [AllowAnonymous]
         public async Task<IActionResult> Details(string id)
         {
             try
@@ -57,14 +58,14 @@ namespace BookReviewApp.Web.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin")]
+        [AllowAnonymous] // Allow anonymous access for development
         public IActionResult Create()
         {
             return View();
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [AllowAnonymous] // Allow anonymous access for development
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Author author)
         {
@@ -86,7 +87,7 @@ namespace BookReviewApp.Web.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin")]
+        [AllowAnonymous] // Allow anonymous access for development
         public async Task<IActionResult> Edit(string id)
         {
             try
@@ -106,7 +107,7 @@ namespace BookReviewApp.Web.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [AllowAnonymous] // Allow anonymous access for development
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, Author author)
         {
