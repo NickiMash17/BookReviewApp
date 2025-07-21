@@ -158,6 +158,46 @@
         });
     }
 
+    // Animate statistics numbers on scroll
+    function animateStats() {
+        const stats = document.querySelectorAll('.stat-number[data-animate]');
+        stats.forEach(stat => {
+            const endValue = parseFloat(stat.getAttribute('data-animate'));
+            let startValue = 0;
+            let duration = 1200;
+            let startTime = null;
+            function animateStep(timestamp) {
+                if (!startTime) startTime = timestamp;
+                const progress = Math.min((timestamp - startTime) / duration, 1);
+                const value = Math.floor(progress * (endValue - startValue) + startValue);
+                stat.textContent = endValue % 1 === 0 ? value : value.toFixed(1);
+                if (progress < 1) {
+                    requestAnimationFrame(animateStep);
+                } else {
+                    stat.textContent = endValue;
+                }
+            }
+            // Only animate if in viewport
+            function onScroll() {
+                const rect = stat.getBoundingClientRect();
+                if (rect.top < window.innerHeight && rect.bottom > 0) {
+                    requestAnimationFrame(animateStep);
+                    window.removeEventListener('scroll', onScroll);
+                }
+            }
+            window.addEventListener('scroll', onScroll);
+            onScroll();
+        });
+    }
+
+    // Initialize testimonial carousel
+    function initTestimonialCarousel() {
+        const carousel = document.getElementById('testimonialCarousel');
+        if (carousel && typeof bootstrap !== 'undefined') {
+            new bootstrap.Carousel(carousel, { interval: 6000, ride: 'carousel' });
+        }
+    }
+
     // Initialize all enhancements when DOM is ready
     document.addEventListener('DOMContentLoaded', function () {
         enhanceFormValidation();
@@ -167,6 +207,8 @@
         enhanceButtonInteractions();
         initLazyLoading();
         initNavigationActiveStates();
+        animateStats();
+        initTestimonialCarousel();
 
         // Show success/error messages as toasts if they exist
         const successMessage = document.querySelector('.alert-success');

@@ -53,13 +53,13 @@ namespace BookReviewApp.Data.Repositories
             // Try to parse as int for backward compatibility
             if (int.TryParse(id, out int intId))
             {
-            return await query.FirstOrDefaultAsync(e => 
+                return await query.FirstOrDefaultAsync(e => 
                     EF.Property<int>(e, $"{typeof(T).Name}Id") == intId);
             }
             
-            // For MongoDB ObjectId strings, we'll need to handle differently
-            // For now, return null as this is primarily for EF Core
-            return null;
+            // Handle string IDs (like MongoDB ObjectIds)
+            return await query.FirstOrDefaultAsync(e => 
+                EF.Property<string>(e, "Id") == id);
         }
 
         /// <summary>

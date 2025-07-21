@@ -18,7 +18,7 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
+  margin-bottom: 0;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   min-height: 100vh;
 }
@@ -225,6 +225,7 @@ body {
     position: relative;
     z-index: 1000;
     box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+    margin-bottom: 0 !important;
 }
 
 .footer-blue .social-icons a {
@@ -310,7 +311,7 @@ body {
 
 /* Ensure main content never gets hidden by footer */
 main.container {
-    padding-bottom: 6rem; /* Increased padding to account for footer and trademark badge */
+    padding-bottom: 0;
     min-height: calc(100vh - 200px); /* Ensure minimum height for content */
 }
 
