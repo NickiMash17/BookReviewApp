@@ -553,11 +553,6 @@ body {
 }
 
 /* Individual social media icon colors on hover */
-.footer-blue .social-icons a[href*="facebook"]:hover {
-    background: rgba(66, 103, 178, 0.8);
-    box-shadow: 0 5px 15px rgba(66, 103, 178, 0.4);
-}
-
 .footer-blue .social-icons a[href*="tiktok"]:hover {
     background: rgba(0, 0, 0, 0.8);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
