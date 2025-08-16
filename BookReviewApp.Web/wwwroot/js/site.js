@@ -593,4 +593,39 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // Enhanced social media interactions
+    const socialLinks = document.querySelectorAll('.social-icons a');
+    socialLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            // Add click animation
+            this.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                this.style.transform = 'scale(1.1)';
+            }, 100);
+            
+            // Track social media clicks (placeholder for analytics)
+            const platform = this.getAttribute('aria-label').toLowerCase();
+            console.log(`User clicked on ${platform} link`);
+            
+            // Optional: Add analytics tracking here
+            // trackSocialMediaClick(platform, this.href);
+        });
+        
+        // Enhanced hover effects
+        link.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-3px) scale(1.1)';
+        });
+        
+        link.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+    
+    // Social media analytics tracking function (placeholder)
+    function trackSocialMediaClick(platform, url) {
+        // This would typically send data to Google Analytics or similar
+        // Example: gtag('event', 'social_media_click', { platform: platform, url: url });
+        console.log(`Analytics: Social media click tracked for ${platform}`);
+    }
 });
