@@ -37,10 +37,7 @@ az account set --subscription "Your Subscription Name"
 
 ### **Option 1: Automated Deployment (Recommended)**
 ```bash
-# Make script executable (already done)
-chmod +x deploy-to-azure.sh
-
-# Run the deployment script
+# Just run this one command:
 ./deploy-to-azure.sh
 ```
 
@@ -81,6 +78,8 @@ az webapp deployment list-publishing-profiles \
 2. Settings → Secrets and variables → Actions
 3. Add new secret: `AZURE_WEBAPP_PUBLISH_PROFILE`
 4. Copy content from `publish-profile.xml`
+
+**✅ PUBLISH PROFILE ADDED TO GITHUB SECRETS - READY FOR AUTOMATIC DEPLOYMENT!**
 
 ### **2. Update App Settings (Optional)**
 ```bash
@@ -168,6 +167,6 @@ dotnet run --environment Production
 ```
 
 ## 🎉 **Congratulations!**
-Your BookReviewApp is now live on Azure with a professional URL!
+Your BookReviewApp repository is now ready for automatic Azure deployment!
 
 **Remember**: Your student account gives you $100 in credits, so you can experiment with other Azure services too! 
