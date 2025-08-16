@@ -198,6 +198,274 @@
         }
     }
 
+    // Enhanced Navigation Functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        // Search functionality
+        const searchInput = document.querySelector('.search-input');
+        const searchBtn = document.querySelector('.search-btn');
+        
+        if (searchInput && searchBtn) {
+            // Search button click
+            searchBtn.addEventListener('click', function() {
+                performSearch();
+            });
+            
+            // Enter key press in search input
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+            
+            // Search input focus effects
+            searchInput.addEventListener('focus', function() {
+                this.parentElement.classList.add('search-focused');
+            });
+            
+            searchInput.addEventListener('blur', function() {
+                this.parentElement.classList.remove('search-focused');
+            });
+        }
+        
+        // Perform search function
+        function performSearch() {
+            const query = searchInput.value.trim();
+            if (query) {
+                // Show loading state
+                searchBtn.innerHTML = '<i class="bi bi-arrow-clockwise spin"></i>';
+                searchBtn.disabled = true;
+                
+                // Simulate search (replace with actual search implementation)
+                setTimeout(() => {
+                    // Redirect to search results or show results
+                    window.location.href = `/Books?search=${encodeURIComponent(query)}`;
+                    
+                    // Reset search button
+                    searchBtn.innerHTML = '<i class="bi bi-search"></i>';
+                    searchBtn.disabled = false;
+                }, 500);
+            }
+        }
+        
+        // Enhanced navbar scroll effects
+        const navbar = document.querySelector('.navbar');
+        let lastScrollTop = 0;
+        
+        window.addEventListener('scroll', function() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            if (scrollTop > 100) {
+                navbar.classList.add('navbar-scrolled');
+            } else {
+                navbar.classList.remove('navbar-scrolled');
+            }
+            
+            // Hide/show navbar on scroll (optional)
+            if (scrollTop > lastScrollTop && scrollTop > 200) {
+                navbar.style.transform = 'translateY(-100%)';
+            } else {
+                navbar.style.transform = 'translateY(0)';
+            }
+            
+            lastScrollTop = scrollTop;
+        });
+        
+        // Smooth navigation link animations
+        const navLinks = document.querySelectorAll('.nav-link-enhanced');
+        navLinks.forEach(link => {
+            link.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+            });
+            
+            link.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+        
+        // Enhanced dropdown animations
+        const dropdowns = document.querySelectorAll('.dropdown');
+        dropdowns.forEach(dropdown => {
+            const menu = dropdown.querySelector('.dropdown-menu');
+            
+            dropdown.addEventListener('show.bs.dropdown', function() {
+                menu.style.opacity = '0';
+                menu.style.transform = 'translateY(-10px)';
+                
+                setTimeout(() => {
+                    menu.style.opacity = '1';
+                    menu.style.transform = 'translateY(0)';
+                }, 10);
+            });
+        });
+        
+        // User menu enhancements
+        const userMenuToggle = document.querySelector('.user-menu-toggle');
+        if (userMenuToggle) {
+            userMenuToggle.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+            });
+            
+            userMenuToggle.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        }
+        
+        // Admin button pulse effect
+        const adminBtn = document.querySelector('.admin-btn');
+        if (adminBtn) {
+            adminBtn.addEventListener('mouseenter', function() {
+                this.style.animation = 'pulse 0.6s infinite';
+            });
+            
+            adminBtn.addEventListener('mouseleave', function() {
+                this.style.animation = 'none';
+            });
+        }
+        
+        // Notification badge click handler
+        const notificationBtn = document.querySelector('.btn-outline-secondary');
+        if (notificationBtn) {
+            notificationBtn.addEventListener('click', function() {
+                // Show notifications panel or redirect
+                showToast('Notifications feature coming soon!', 'info');
+            });
+        }
+        
+        // Brand logo hover effect
+        const brandLogo = document.querySelector('.brand-logo');
+        if (brandLogo) {
+            brandLogo.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.1) rotate(5deg)';
+            });
+            
+            brandLogo.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1) rotate(0deg)';
+            });
+        }
+        
+        // Top notification bar interactions
+        const topBar = document.querySelector('.top-notification-bar');
+        if (topBar) {
+            // Add close button functionality
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'btn-close btn-close-white btn-sm ms-2';
+            closeBtn.setAttribute('aria-label', 'Close notification');
+            closeBtn.addEventListener('click', function() {
+                topBar.style.display = 'none';
+            });
+            
+            const supportLink = topBar.querySelector('a[href^="mailto:"]');
+            if (supportLink) {
+                supportLink.parentNode.appendChild(closeBtn);
+            }
+        }
+        
+        // Enhanced mobile navigation
+        const navbarToggler = document.querySelector('.navbar-toggler');
+        const navbarCollapse = document.querySelector('.navbar-collapse');
+        
+        if (navbarToggler && navbarCollapse) {
+            navbarToggler.addEventListener('click', function() {
+                // Add animation class
+                navbarCollapse.classList.add('collapsing');
+                
+                setTimeout(() => {
+                    navbarCollapse.classList.remove('collapsing');
+                }, 350);
+            });
+        }
+        
+        // Search suggestions (placeholder for future implementation)
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const query = this.value.trim();
+                if (query.length > 2) {
+                    // Show search suggestions
+                    showSearchSuggestions(query);
+                } else {
+                    hideSearchSuggestions();
+                }
+            });
+        }
+        
+        function showSearchSuggestions(query) {
+            // Placeholder for search suggestions
+            // This would typically fetch from an API and display suggestions
+            console.log('Showing suggestions for:', query);
+        }
+        
+        function hideSearchSuggestions() {
+            // Hide search suggestions
+            console.log('Hiding suggestions');
+        }
+        
+        // Enhanced toast notifications
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            toast.innerHTML = `
+                <i class="bi bi-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.remove();
+                }
+            }, 5000);
+        }
+        
+        // Add CSS for enhanced animations
+        const style = document.createElement('style');
+        style.textContent = `
+            .navbar {
+                transition: transform 0.3s ease, background-color 0.3s ease;
+            }
+            
+            .navbar-scrolled {
+                background: rgba(255, 255, 255, 0.98) !important;
+                backdrop-filter: blur(25px);
+            }
+            
+            .dropdown-menu {
+                transition: opacity 0.3s ease, transform 0.3s ease;
+            }
+            
+            .search-focused .search-input {
+                border-color: #667eea;
+                box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            }
+            
+            .spin {
+                animation: spin 1s linear infinite;
+            }
+            
+            @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+            
+            .navbar-collapse.collapsing {
+                transition: height 0.35s ease;
+            }
+            
+            .btn-close {
+                transition: all 0.3s ease;
+            }
+            
+            .btn-close:hover {
+                transform: scale(1.2);
+            }
+        `;
+        document.head.appendChild(style);
+    });
+
     // Initialize all enhancements when DOM is ready
     document.addEventListener('DOMContentLoaded', function () {
         enhanceFormValidation();
@@ -239,3 +507,90 @@
     }
 
 })();
+
+// Enhanced form validation
+function validateForm(formElement) {
+    const inputs = formElement.querySelectorAll('input[required], select[required], textarea[required]');
+    let isValid = true;
+    
+    inputs.forEach(input => {
+        if (!input.value.trim()) {
+            input.classList.add('is-invalid');
+            isValid = false;
+        } else {
+            input.classList.remove('is-invalid');
+            input.classList.add('is-valid');
+        }
+    });
+    
+    return isValid;
+}
+
+// Enhanced image loading with skeleton
+function loadImageWithSkeleton(imgElement, src) {
+    const skeleton = document.createElement('div');
+    skeleton.className = 'card-skeleton';
+    skeleton.style.cssText = 'width: 100%; height: 300px; border-radius: 1.5rem 1.5rem 0 0;';
+    
+    imgElement.parentNode.insertBefore(skeleton, imgElement);
+    imgElement.style.display = 'none';
+    
+    imgElement.onload = function() {
+        skeleton.remove();
+        imgElement.style.display = 'block';
+        imgElement.style.opacity = '0';
+        
+        setTimeout(() => {
+            imgElement.style.transition = 'opacity 0.5s ease';
+            imgElement.style.opacity = '1';
+        }, 100);
+    };
+    
+    imgElement.onerror = function() {
+        skeleton.remove();
+        imgElement.src = '/images/no-cover.png';
+        imgElement.style.display = 'block';
+    };
+    
+    imgElement.src = src;
+}
+
+// Enhanced card hover effects
+function enhanceCardHoverEffects() {
+    const cards = document.querySelectorAll('.book-card, .author-card, .review-card');
+    
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-8px) scale(1.02)';
+            this.style.boxShadow = '0 12px 40px rgba(102,126,234,0.25)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+            this.style.boxShadow = '0 4px 20px rgba(0,0,0,0.08)';
+        });
+    });
+}
+
+// Initialize enhanced features when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    enhanceCardHoverEffects();
+    
+    // Enhanced loading states for buttons
+    const buttons = document.querySelectorAll('.btn');
+    buttons.forEach(button => {
+        button.addEventListener('click', function() {
+            if (this.type === 'submit' && !this.disabled) {
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="bi bi-arrow-clockwise spin me-2"></i>Loading...';
+                this.disabled = true;
+                
+                // Re-enable after form submission (this is a simplified version)
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                    this.disabled = false;
+                }, 2000);
+            }
+        });
+    });
+});
