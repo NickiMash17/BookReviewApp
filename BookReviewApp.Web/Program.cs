@@ -38,8 +38,8 @@ if (useMongoDB)
     try
     {
         // Try to register MongoDB repositories
-        builder.Services.AddScoped<IRepository<Book>, MongoBookRepository>();
-        builder.Services.AddScoped<IRepository<Author>, MongoAuthorRepository>();
+builder.Services.AddScoped<IRepository<Book>, MongoBookRepository>();
+builder.Services.AddScoped<IRepository<Author>, MongoAuthorRepository>();
         Console.WriteLine("MongoDB repositories registered successfully");
     }
     catch (Exception ex)
