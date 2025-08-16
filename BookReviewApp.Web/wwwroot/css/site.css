@@ -60,6 +60,24 @@ body {
   line-height: 1.2;
 }
 
+/* Navigation Spacing */
+.navbar-brand {
+  margin-right: 3rem !important;
+  min-width: 200px;
+}
+
+.navbar-nav {
+  margin-left: 2rem;
+}
+
+.nav-item {
+  margin-right: 1.5rem;
+}
+
+.nav-item:last-child {
+  margin-right: 0;
+}
+
 /* Enhanced Navigation Links */
 .nav-link-enhanced {
   font-weight: 500;
@@ -69,6 +87,7 @@ body {
   margin: 0 0.25rem;
   position: relative;
   color: #495057 !important;
+  white-space: nowrap;
 }
 
 .nav-link-enhanced:hover {
