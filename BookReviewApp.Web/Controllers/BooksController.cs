@@ -105,14 +105,16 @@ namespace BookReviewApp.Web.Controllers
                         }
                         var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/books");
                         Directory.CreateDirectory(uploadsFolder);
-                        var ext = Path.GetExtension(CoverImage.FileName).ToLowerInvariant();
-                        var fileName = $"book_{DateTime.Now.Ticks}{ext}";
-                        var filePath = Path.Combine(uploadsFolder, fileName);
+                        var fileName = CoverImage.FileName ?? "unknown";
+                        var ext = Path.GetExtension(fileName);
+                        var extension = string.IsNullOrEmpty(ext) ? ".unknown" : ext.ToLowerInvariant();
+                        var finalFileName = $"book_{DateTime.Now.Ticks}{extension}";
+                        var filePath = Path.Combine(uploadsFolder, finalFileName);
                         using (var stream = new FileStream(filePath, FileMode.Create))
                         {
                             await CoverImage.CopyToAsync(stream);
                         }
-                        book.CoverImageUrl = $"/images/books/{fileName}";
+                        book.CoverImageUrl = $"/images/books/{finalFileName}";
                     }
                     await _bookService.AddBookAsync(book);
                     TempData["SuccessMessage"] = "Book created successfully!";

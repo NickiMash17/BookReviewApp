@@ -77,7 +77,7 @@ namespace BookReviewApp.Services.Implementations
                 include: query => query
                     .Include(r => r.User)
                     .Include(r => r.Book)
-                    .Include(r => r.Book.Author));
+                    .Include(r => r.Book!.Author));
         }
 
         public async Task<double> GetAverageRatingForBookAsync(string bookId)

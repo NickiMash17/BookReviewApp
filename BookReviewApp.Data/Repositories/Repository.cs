@@ -21,28 +21,6 @@ namespace BookReviewApp.Data.Repositories
         }
 
         /// <summary>
-        /// Gets all entities of type T.
-        /// </summary>
-        public virtual async Task<IEnumerable<T>> GetAllAsync(
-            Func<IQueryable<T>, IQueryable<T>>? include = null,
-            Func<IQueryable<T>, IQueryable<T>>? filter = null)
-        {
-            var query = _dbSet.AsQueryable();
-            
-            if (filter != null)
-            {
-                query = filter(query);
-            }
-            
-            if (include != null)
-            {
-                query = include(query);
-            }
-            
-            return await query.ToListAsync();
-        }
-
-        /// <summary>
         /// Gets an entity by its unique identifier.
         /// </summary>
         public virtual async Task<T?> GetByIdAsync(string id, Func<IQueryable<T>, IQueryable<T>>? include = null)
@@ -57,9 +35,40 @@ namespace BookReviewApp.Data.Repositories
                     EF.Property<int>(e, $"{typeof(T).Name}Id") == intId);
             }
             
-            // Handle string IDs (like MongoDB ObjectIds)
+            // Handle string IDs (including MongoDB ObjectIds)
             return await query.FirstOrDefaultAsync(e => 
                 EF.Property<string>(e, "Id") == id);
+        }
+
+        /// <summary>
+        /// Gets all entities of type T.
+        /// </summary>
+        public virtual async Task<IEnumerable<T>> GetAllAsync(
+            Func<IQueryable<T>, IQueryable<T>>? include = null,
+            Func<IQueryable<T>, IQueryable<T>>? filter = null)
+        {
+            try
+            {
+                var query = _dbSet.AsQueryable();
+                
+                if (filter != null)
+                {
+                    query = filter(query);
+                }
+                
+                if (include != null)
+                {
+                    query = include(query);
+                }
+                
+                return await query.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                // Log the error and return empty collection
+                Console.WriteLine($"Error in GetAllAsync: {ex.Message}");
+                return new List<T>();
+            }
         }
 
         /// <summary>

@@ -33,13 +33,13 @@ public class HomeController : BaseController
         try
         {
             // Get statistics
-            var books = await _bookService.GetAllBooksWithAuthorsAsync();
-            var authors = await _authorService.GetAllAuthorsAsync();
-            var reviews = await _reviewService.GetAllReviewsAsync();
+            var books = (await _bookService.GetAllBooksWithAuthorsAsync()).ToList();
+            var authors = (await _authorService.GetAllAuthorsAsync()).ToList();
+            var reviews = (await _reviewService.GetAllReviewsAsync()).ToList();
 
-            ViewBag.TotalBooks = books.Count();
-            ViewBag.TotalAuthors = authors.Count();
-            ViewBag.TotalReviews = reviews.Count();
+            ViewBag.TotalBooks = books.Count;
+            ViewBag.TotalAuthors = authors.Count;
+            ViewBag.TotalReviews = reviews.Count;
             ViewBag.AverageRating = reviews.Any() ? reviews.Average(r => r.Rating).ToString("F1") : "0.0";
 
             // Get featured books (top 4 by rating or most recent)

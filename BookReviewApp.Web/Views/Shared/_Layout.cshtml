@@ -51,6 +51,11 @@
                                 <i class="bi bi-star"></i> Reviews
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Privacy" aria-label="Privacy Policy">
+                                <i class="bi bi-shield-lock"></i> Privacy
+                            </a>
+                        </li>
                         @if (User.Identity?.IsAuthenticated ?? false)
                         {
                             <li class="nav-item">
@@ -137,6 +142,9 @@
             <div class="row align-items-center">
                 <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
                     <p class="mb-0 fw-bold fs-5">&copy; @DateTime.Now.Year Book Review App. All rights reserved.</p>
+                    <p class="mb-0 mt-2">
+                        <a href="@Url.Action("Privacy", "Home")" class="text-white text-decoration-none small">Privacy Policy</a>
+                    </p>
                 </div>
                 <div class="col-md-6 text-center text-md-end">
                     <div class="social-icons d-flex justify-content-center justify-content-md-end gap-3">

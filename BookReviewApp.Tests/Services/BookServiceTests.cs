@@ -53,8 +53,8 @@ namespace BookReviewApp.Tests.Services
             result.Should().BeEquivalentTo(testData, options => 
                 options.Including(b => b.Id)
                        .Including(b => b.Title)
-                       .Including(b => b.Author.Id)
-                       .Including(b => b.Author.Name));
+                       .Including(b => b.Author!.Id)
+                       .Including(b => b.Author!.Name));
 
             _mockBookRepository.Verify(
                 repo => repo.GetAllAsync(

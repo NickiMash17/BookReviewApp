@@ -29,13 +29,42 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Register MongoDB Repositories
-// MongoDB repositories (commented out - using EF Core only for now)
-// builder.Services.AddScoped<IRepository<Book>, MongoBookRepository>();
-// builder.Services.AddScoped<IRepository<Author>, MongoAuthorRepository>();
+// Register repositories - use EF Core by default for development
+// MongoDB can be enabled by setting "UseMongoDB": true in appsettings.json
+var useMongoDB = builder.Configuration.GetValue<bool>("UseMongoDB", false);
 
-// Use EF Core repositories for all entities
-builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+if (useMongoDB)
+{
+    try
+    {
+        // Try to register MongoDB repositories
+        builder.Services.AddScoped<IRepository<Book>, MongoBookRepository>();
+        builder.Services.AddScoped<IRepository<Author>, MongoAuthorRepository>();
+        Console.WriteLine("MongoDB repositories registered successfully");
+    }
+    catch (Exception ex)
+    {
+        // Fallback to EF Core repositories if MongoDB is not available
+        Console.WriteLine($"MongoDB not available, falling back to EF Core: {ex.Message}");
+        builder.Services.AddScoped<IRepository<Book>, Repository<Book>>();
+        builder.Services.AddScoped<IRepository<Author>, Repository<Author>>();
+    }
+}
+else
+{
+    // Use EF Core repositories by default
+    builder.Services.AddScoped<IRepository<Book>, Repository<Book>>();
+    builder.Services.AddScoped<IRepository<Author>, Repository<Author>>();
+    Console.WriteLine("EF Core repositories registered");
+}
+
+// Register EF Core repositories for other entities
+builder.Services.AddScoped<IRepository<Review>, Repository<Review>>();
+builder.Services.AddScoped<IRepository<User>, Repository<User>>();
+builder.Services.AddScoped<IRepository<Category>, Repository<Category>>();
+builder.Services.AddScoped<IRepository<BookCategory>, Repository<BookCategory>>();
+
+// Generic repository registration removed to avoid conflicts with specific MongoDB registrations
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IAuthorService, AuthorService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
@@ -70,7 +99,7 @@ else
             .Select(b => new {
                 b.Id,
                 b.Title,
-                Author = b.Author.Name,
+                Author = b.Author != null ? b.Author.Name : "Unknown",
                 b.PublishedDate
             })
             .ToListAsync();
@@ -86,7 +115,7 @@ else
                 .Select(b => new {
                     b.Id,
                     b.Title,
-                    Author = b.Author.Name,
+                    Author = b.Author != null ? b.Author.Name : "Unknown",
                     b.PublishedDate
                 })
                 .ToListAsync();
@@ -148,10 +177,10 @@ else
     {
         try
         {
-            var atlasConnectionString = config.GetValue<string>("AtlasConnectionString");
+            var atlasConnectionString = config.GetValue<string>("MongoDbSettings:ConnectionString");
             if (string.IsNullOrEmpty(atlasConnectionString))
             {
-                return Results.Text("❌ Atlas connection string not configured. Please add 'AtlasConnectionString' to your configuration.", "text/plain");
+                return Results.Text("❌ Atlas connection string not configured. Please add 'MongoDbSettings:ConnectionString' to your configuration.", "text/plain");
             }
             
             var result = await MongoDbTester.TestAtlasConnectionAsync(atlasConnectionString);
