@@ -44,7 +44,7 @@
         <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top" aria-label="Main navigation">
             <div class="container">
                 <!-- Brand Logo -->
-                <a class="navbar-brand d-flex align-items-center me-5" asp-controller="Home" asp-action="Index">
+                <a class="navbar-brand d-flex align-items-center me-4" asp-controller="Home" asp-action="Index">
                     <div class="brand-logo me-3">
                         <i class="bi bi-book text-primary fs-3"></i>
                     </div>
@@ -62,26 +62,26 @@
                 <!-- Navigation Content -->
                 <div class="collapse navbar-collapse" id="mainNavbar">
                     <!-- Main Navigation Links -->
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-4">
-                        <li class="nav-item me-3">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-3">
+                        <li class="nav-item me-2">
                             <a class="nav-link nav-link-enhanced" asp-controller="Home" asp-action="Index" aria-label="Home">
                                 <i class="bi bi-house-door-fill me-2"></i>
                                 <span class="nav-text">Home</span>
                             </a>
                         </li>
-                        <li class="nav-item me-3">
+                        <li class="nav-item me-2">
                             <a class="nav-link nav-link-enhanced" asp-controller="Books" asp-action="Index" aria-label="Books">
                                 <i class="bi bi-book-fill me-2"></i>
                                 <span class="nav-text">Books</span>
                             </a>
                         </li>
-                        <li class="nav-item me-3">
+                        <li class="nav-item me-2">
                             <a class="nav-link nav-link-enhanced" asp-controller="Authors" asp-action="Index" aria-label="Authors">
                                 <i class="bi bi-people-fill me-2"></i>
                                 <span class="nav-text">Authors</span>
                             </a>
                         </li>
-                        <li class="nav-item me-3">
+                        <li class="nav-item me-2">
                             <a class="nav-link nav-link-enhanced" asp-controller="Reviews" asp-action="Index" aria-label="Reviews">
                                 <i class="bi bi-star-fill me-2"></i>
                                 <span class="nav-text">Reviews</span>
@@ -89,7 +89,7 @@
                         </li>
                         @if (User.Identity?.IsAuthenticated ?? false)
                         {
-                            <li class="nav-item me-3">
+                            <li class="nav-item me-2">
                                 <a class="nav-link nav-link-enhanced" asp-controller="Dashboard" asp-action="Index" aria-label="Dashboard">
                                     <i class="bi bi-graph-up me-2"></i>
                                     <span class="nav-text">Dashboard</span>

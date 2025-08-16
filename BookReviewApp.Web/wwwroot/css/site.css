@@ -62,16 +62,16 @@ body {
 
 /* Navigation Spacing */
 .navbar-brand {
-  margin-right: 3rem !important;
-  min-width: 200px;
+  margin-right: 2rem !important;
+  min-width: 180px;
 }
 
 .navbar-nav {
-  margin-left: 2rem;
+  margin-left: 1.5rem;
 }
 
 .nav-item {
-  margin-right: 1.5rem;
+  margin-right: 1rem;
 }
 
 .nav-item:last-child {
