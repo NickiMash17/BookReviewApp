@@ -46,7 +46,7 @@ builder.Services.AddSingleton<MongoDbContext>();
                     var userId = "bookreviewadmin";
                     var password = "BookReviewApp2025!";
                     
-                    connectionString = $"Server=tcp:{server},1433;Initial Catalog={database};Persist Security Info=False;User ID={userId};Password={password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
+                    connectionString = $"Server={server};Database={database};User ID={userId};Password={password};Encrypt=true;TrustServerCertificate=false;";
                     Console.WriteLine("Using hardcoded Azure SQL Database connection");
                 }
                 else
