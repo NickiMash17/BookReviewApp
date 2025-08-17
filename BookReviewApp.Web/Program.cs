@@ -492,7 +492,9 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 // Initialize database before starting the application
-await InitializeDatabaseAsync(app);
+// TEMPORARILY DISABLED FOR DEBUGGING
+// await InitializeDatabaseAsync(app);
+Console.WriteLine("Database initialization temporarily disabled for debugging");
 
 // Generate placeholder images (Windows only)
 if (OperatingSystem.IsWindows())
