@@ -519,7 +519,27 @@ static async Task InitializeDatabaseAsync(WebApplication app)
     try
     {
         logger.LogInformation("Starting database initialization...");
+        
+        // Add timeout to prevent hanging
+        using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(2));
+        
         var context = services.GetRequiredService<ApplicationDbContext>();
+        logger.LogInformation("DbContext retrieved successfully");
+
+        // Test basic connection first
+        logger.LogInformation("Testing database connection...");
+        try
+        {
+            var connection = context.Database.GetDbConnection();
+            await connection.OpenAsync(cts.Token);
+            logger.LogInformation($"Database connection successful - Server: {connection.DataSource}, Database: {connection.Database}");
+            await connection.CloseAsync();
+        }
+        catch (Exception connEx)
+        {
+            logger.LogError(connEx, "Failed to connect to database");
+            throw;
+        }
 
         // Always ensure database exists (this will create it if it doesn't exist)
         logger.LogInformation("Ensuring database exists...");
@@ -529,16 +549,17 @@ static async Task InitializeDatabaseAsync(WebApplication app)
         if (forceRecreation)
         {
             logger.LogInformation("Force database recreation enabled - dropping and recreating database");
-            await context.Database.EnsureDeletedAsync();
+            await context.Database.EnsureDeletedAsync(cts.Token);
         }
         
-        await context.Database.EnsureCreatedAsync();
+        await context.Database.EnsureCreatedAsync(cts.Token);
         logger.LogInformation("Database created/verified successfully");
         
-        // Check if database has data
-        var hasUsers = await context.Users.AnyAsync();
-        var hasBooks = await context.Books.AnyAsync();
-        var hasAuthors = await context.Authors.AnyAsync();
+        // Check if database has data with timeout
+        logger.LogInformation("Checking database content...");
+        var hasUsers = await context.Users.AnyAsync(cts.Token);
+        var hasBooks = await context.Books.AnyAsync(cts.Token);
+        var hasAuthors = await context.Authors.AnyAsync(cts.Token);
         
         logger.LogInformation($"Database status - Users: {hasUsers}, Books: {hasBooks}, Authors: {hasAuthors}");
         
@@ -564,19 +585,24 @@ static async Task InitializeDatabaseAsync(WebApplication app)
             logger.LogInformation("Database already has data, skipping seeding");
         }
         
-        // Verify database is working
-        var userCount = await context.Users.CountAsync();
-        var bookCount = await context.Books.CountAsync();
-        var authorCount = await context.Authors.CountAsync();
+        // Verify database is working with timeout
+        logger.LogInformation("Verifying database functionality...");
+        var userCount = await context.Users.CountAsync(cts.Token);
+        var bookCount = await context.Books.CountAsync(cts.Token);
+        var authorCount = await context.Authors.CountAsync(cts.Token);
         
         logger.LogInformation($"Database verification - Users: {userCount}, Books: {bookCount}, Authors: {authorCount}");
         
         logger.LogInformation("Database initialization completed successfully");
     }
+    catch (OperationCanceledException)
+    {
+        logger.LogError("Database initialization timed out after 2 minutes");
+        logger.LogWarning("Application will continue without database initialization - some features may not work");
+    }
     catch (Exception ex)
     {
         logger.LogError(ex, "Critical error during database initialization");
-        // In production, we might want to fail fast, but for now let's continue
         logger.LogWarning("Application will continue without database initialization - some features may not work");
     }
 }
