@@ -7,9 +7,9 @@ using System.Linq.Expressions;
 namespace BookReviewApp.Data.Repositories
 {
     /// <summary>
-    /// Generic repository for CRUD operations on entities.
+    /// Generic repository implementation using Entity Framework Core.
     /// </summary>
-    public class Repository<T> : IRepository<T> where T : class
+    public class Repository<T> : IRepository<T> where T : BaseEntity
     {
         protected readonly ApplicationDbContext _context;
         protected readonly DbSet<T> _dbSet;
@@ -76,8 +76,19 @@ namespace BookReviewApp.Data.Repositories
         /// </summary>
         public virtual async Task AddAsync(T entity)
         {
-            await _dbSet.AddAsync(entity);
-            await _context.SaveChangesAsync();
+            try
+            {
+                Console.WriteLine($"Adding entity of type {typeof(T).Name} with ID: {entity.Id}");
+                _dbSet.Add(entity);
+                await _context.SaveChangesAsync();
+                Console.WriteLine($"Entity added successfully with ID: {entity.Id}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error adding entity: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                throw;
+            }
         }
 
         /// <summary>

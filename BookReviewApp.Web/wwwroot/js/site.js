@@ -64,6 +64,11 @@
     function enhanceFormValidation() {
         const forms = document.querySelectorAll('form');
         forms.forEach(form => {
+            // Skip authentication forms to prevent interference
+            if (form.action && (form.action.includes('/Account/Login') || form.action.includes('/Account/Register'))) {
+                return;
+            }
+            
             form.addEventListener('submit', function (e) {
                 const submitBtn = form.querySelector('button[type="submit"]');
                 if (submitBtn) {

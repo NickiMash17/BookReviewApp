@@ -35,20 +35,31 @@ namespace BookReviewApp.Web.Controllers
         {
             try
             {
+                Console.WriteLine($"Register attempt for user: {model.Username} ({model.Email})");
+                
                 if (!ModelState.IsValid)
+                {
+                    Console.WriteLine($"Model validation failed: {string.Join(", ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage))}");
                     return View(model);
+                }
 
+                Console.WriteLine("Checking if email exists...");
                 if (await _userService.EmailExistsAsync(model.Email))
                 {
+                    Console.WriteLine($"Email {model.Email} already exists");
                     ModelState.AddModelError("Email", "Email is already registered.");
                     return View(model);
                 }
+                
+                Console.WriteLine("Checking if username exists...");
                 if (await _userService.UsernameExistsAsync(model.Username))
                 {
+                    Console.WriteLine($"Username {model.Username} already exists");
                     ModelState.AddModelError("Username", "Username is already taken.");
                     return View(model);
                 }
 
+                Console.WriteLine("Creating user object...");
                 var user = new User
                 {
                     Email = model.Email,
@@ -59,15 +70,22 @@ namespace BookReviewApp.Web.Controllers
                     EmailConfirmed = true, // Auto-confirm for development
                     IsActive = true
                 };
+                
+                Console.WriteLine("Adding user to database...");
                 await _userService.AddUserAsync(user);
+                Console.WriteLine($"User {user.Username} added successfully with ID: {user.UserId}");
                 
                 // For development: auto-sign in the user
+                Console.WriteLine("Signing in user...");
                 await SignInUser(user, false);
                 TempData["SuccessMessage"] = "Registration successful! You are now logged in.";
+                Console.WriteLine("Registration completed successfully");
                 return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"Registration error: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
                 return HandleError(ex, "An error occurred during registration.");
             }
         }

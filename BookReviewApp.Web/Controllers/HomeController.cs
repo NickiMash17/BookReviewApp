@@ -4,11 +4,13 @@
 //
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using BookReviewApp.Web.Models;
 using BookReviewApp.Services.Interfaces;
-using System.Linq;
+using BookReviewApp.Domain.Models;
+using BookReviewApp.Web.Models;
 using System.Collections.Generic;
 using System;
+using Microsoft.Extensions.DependencyInjection;
+using BookReviewApp.Data.Context;
 
 namespace BookReviewApp.Web.Controllers;
 
@@ -67,6 +69,13 @@ public class HomeController : BaseController
     public IActionResult Privacy()
     {
         return View();
+    }
+
+    [HttpGet]
+    public IActionResult Test()
+    {
+        return Content("App is working! Database status: " + 
+                     (HttpContext.RequestServices.GetService<ApplicationDbContext>() != null ? "Available" : "Not Available"));
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

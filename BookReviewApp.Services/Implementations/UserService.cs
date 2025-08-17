@@ -58,9 +58,18 @@ namespace BookReviewApp.Services.Implementations
         /// </summary>
         public async Task AddUserAsync(User user)
         {
-            // Hash the password before saving using simple SHA256
-            user.PasswordHash = HashPassword(user.PasswordHash);
-            await _userRepository.AddAsync(user);
+            try
+            {
+                // Hash the password before saving using simple SHA256
+                user.PasswordHash = HashPassword(user.PasswordHash);
+                await _userRepository.AddAsync(user);
+                Console.WriteLine($"User {user.Username} added successfully with ID: {user.UserId}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error adding user {user.Username}: {ex.Message}");
+                throw;
+            }
         }
 
         /// <summary>

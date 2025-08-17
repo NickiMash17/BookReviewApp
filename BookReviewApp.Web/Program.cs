@@ -24,10 +24,49 @@ builder.Services.Configure<MongoDbSettings>(
 // Add MongoDB Context
 builder.Services.AddSingleton<MongoDbContext>();
 
-// Add services to the container
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
+        // Configure database connection
+        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+        
+        // For Azure, use SQL Server; for local development, use SQLite
+        if (string.IsNullOrEmpty(connectionString))
+        {
+            // Check if we're running in Azure
+            var isAzure = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME"));
+            
+            if (isAzure)
+            {
+                // Use Azure SQL Database connection string
+                var server = Environment.GetEnvironmentVariable("AZURE_SQL_SERVER") ?? "your-server.database.windows.net";
+                var database = Environment.GetEnvironmentVariable("AZURE_SQL_DATABASE") ?? "BookReviewAppDB";
+                var userId = Environment.GetEnvironmentVariable("AZURE_SQL_USERID") ?? "your-username";
+                var password = Environment.GetEnvironmentVariable("AZURE_SQL_PASSWORD") ?? "your-password";
+                
+                connectionString = $"Server={server};Database={database};User Id={userId};Password={password};TrustServerCertificate=true;";
+                Console.WriteLine("Using Azure SQL Database connection");
+            }
+            else
+            {
+                // Fallback to local development with SQLite
+                connectionString = "Data Source=BookReviewApp.db";
+                Console.WriteLine("Using local SQLite database for development");
+            }
+        }
+        
+        // Register the appropriate DbContext based on connection string
+        if (connectionString.Contains("Server=") || connectionString.Contains("database.windows.net"))
+        {
+            // Azure SQL Database
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(connectionString));
+            Console.WriteLine("SQL Server DbContext registered");
+        }
+        else
+        {
+            // Local SQLite
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlite(connectionString));
+            Console.WriteLine("SQLite DbContext registered");
+        }
 
 // Register repositories - use EF Core by default for development
 // MongoDB can be enabled by setting "UseMongoDB": true in appsettings.json
@@ -469,25 +508,65 @@ static async Task InitializeDatabaseAsync(WebApplication app)
 
     try
     {
-        logger.LogInformation("Initializing database...");
+        logger.LogInformation("Starting database initialization...");
         var context = services.GetRequiredService<ApplicationDbContext>();
 
-        // Ensure database exists and is up to date
+        // Always ensure database exists (this will create it if it doesn't exist)
+        logger.LogInformation("Ensuring database exists...");
+        
+        // In Azure production, always recreate the database since it gets deleted on deployment
+        var forceRecreation = app.Configuration.GetValue<bool>("ForceDatabaseRecreation", false);
+        if (forceRecreation)
+        {
+            logger.LogInformation("Force database recreation enabled - dropping and recreating database");
+            await context.Database.EnsureDeletedAsync();
+        }
+        
         await context.Database.EnsureCreatedAsync();
+        logger.LogInformation("Database created/verified successfully");
         
-        // Reset and seed data in development
-        bool resetData = app.Environment.IsDevelopment();
-        await BookReviewApp.Data.Seed.SeedData.Initialize<Program>(services, resetData);
+        // Check if database has data
+        var hasUsers = await context.Users.AnyAsync();
+        var hasBooks = await context.Books.AnyAsync();
+        var hasAuthors = await context.Authors.AnyAsync();
         
-        // Initialize MongoDB data (commented out for demo - MongoDB not running locally)
-        // var mongoContext = services.GetRequiredService<MongoDbContext>();
-        // await MongoSeedData.InitializeAsync(mongoContext);
+        logger.LogInformation($"Database status - Users: {hasUsers}, Books: {hasBooks}, Authors: {hasAuthors}");
+        
+        // Always seed data if database is empty (this ensures it works in Azure)
+        bool shouldSeedData = !hasUsers || !hasBooks || !hasAuthors;
+        logger.LogInformation($"Should seed data: {shouldSeedData}");
+        
+        if (shouldSeedData)
+        {
+            logger.LogInformation("Starting data seeding...");
+            try
+            {
+                await BookReviewApp.Data.Seed.SeedData.Initialize<Program>(services, true);
+                logger.LogInformation("Data seeding completed successfully");
+            }
+            catch (Exception seedEx)
+            {
+                logger.LogError(seedEx, "Error during data seeding, but continuing...");
+            }
+        }
+        else
+        {
+            logger.LogInformation("Database already has data, skipping seeding");
+        }
+        
+        // Verify database is working
+        var userCount = await context.Users.CountAsync();
+        var bookCount = await context.Books.CountAsync();
+        var authorCount = await context.Authors.CountAsync();
+        
+        logger.LogInformation($"Database verification - Users: {userCount}, Books: {bookCount}, Authors: {authorCount}");
         
         logger.LogInformation("Database initialization completed successfully");
     }
     catch (Exception ex)
     {
-        logger.LogError(ex, "An error occurred while initializing the database");
-        throw;
+        logger.LogError(ex, "Critical error during database initialization");
+        // In production, we might want to fail fast, but for now let's continue
+        logger.LogWarning("Application will continue without database initialization - some features may not work");
     }
 }

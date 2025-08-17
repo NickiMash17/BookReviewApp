@@ -6,21 +6,21 @@
     <div class="card shadow-sm">
         <div class="card-body">
             <h2 class="mb-4 text-center">Sign In</h2>
-            <form asp-action="Login" method="post" novalidate>
+            <form id="loginForm" asp-action="Login" method="post" novalidate>
                 <div asp-validation-summary="All" class="text-danger mb-3"></div>
                 <div class="mb-3">
-                    <label asp-for="EmailOrUsername" class="form-label"></label>
-                    <input asp-for="EmailOrUsername" class="form-control" />
+                    <label asp-for="EmailOrUsername" class="form-label">Email or Username</label>
+                    <input asp-for="EmailOrUsername" class="form-control" placeholder="Enter your email or username" />
                     <span asp-validation-for="EmailOrUsername" class="text-danger"></span>
                 </div>
                 <div class="mb-3">
-                    <label asp-for="Password" class="form-label"></label>
-                    <input asp-for="Password" class="form-control" />
+                    <label asp-for="Password" class="form-label">Password</label>
+                    <input asp-for="Password" type="password" class="form-control" placeholder="Enter your password" />
                     <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
                 <div class="form-check mb-3">
                     <input asp-for="RememberMe" class="form-check-input" />
-                    <label asp-for="RememberMe" class="form-check-label"></label>
+                    <label asp-for="RememberMe" class="form-check-label">Remember me</label>
                 </div>
                 <button type="submit" class="btn btn-primary w-100" aria-label="Login to your account">Login</button>
             </form>
@@ -33,6 +33,23 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+            console.log('Login form submitted');
+            const submitBtn = this.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Logging in...';
+            }
+        });
+    }
+});
+</script>
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 } 
