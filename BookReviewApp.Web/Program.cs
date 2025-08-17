@@ -35,14 +35,24 @@ builder.Services.AddSingleton<MongoDbContext>();
             
             if (isAzure)
             {
-                // Use Azure SQL Database connection string
-                var server = Environment.GetEnvironmentVariable("AZURE_SQL_SERVER") ?? "your-server.database.windows.net";
-                var database = Environment.GetEnvironmentVariable("AZURE_SQL_DATABASE") ?? "BookReviewAppDB";
-                var userId = Environment.GetEnvironmentVariable("AZURE_SQL_USERID") ?? "your-username";
-                var password = Environment.GetEnvironmentVariable("AZURE_SQL_PASSWORD") ?? "your-password";
+                // Try to get connection string from Azure App Service configuration
+                connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
                 
-                connectionString = $"Server={server};Database={database};User Id={userId};Password={password};TrustServerCertificate=true;";
-                Console.WriteLine("Using Azure SQL Database connection");
+                if (string.IsNullOrEmpty(connectionString))
+                {
+                    // Fallback to hardcoded Azure SQL Database connection string
+                    var server = "bookreviewapp-sql-1755367448.database.windows.net";
+                    var database = "BookReviewAppDB";
+                    var userId = "bookreviewadmin";
+                    var password = "BookReviewApp2025!";
+                    
+                    connectionString = $"Server=tcp:{server},1433;Initial Catalog={database};Persist Security Info=False;User ID={userId};Password={password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
+                    Console.WriteLine("Using hardcoded Azure SQL Database connection");
+                }
+                else
+                {
+                    Console.WriteLine("Using Azure App Service connection string");
+                }
             }
             else
             {
