@@ -496,6 +496,11 @@ app.MapControllerRoute(
 // await InitializeDatabaseAsync(app);
 Console.WriteLine("Database initialization temporarily disabled for debugging");
 
+// ADDING OBVIOUS CHANGE TO VERIFY DEPLOYMENT
+Console.WriteLine("=== APP STARTUP DEBUGGING ENABLED ===");
+Console.WriteLine("=== THIS SHOULD APPEAR IN LOGS ===");
+Console.WriteLine("=== IF YOU SEE THIS, OUR CODE IS WORKING ===");
+
 // Generate placeholder images (Windows only)
 if (OperatingSystem.IsWindows())
 {
