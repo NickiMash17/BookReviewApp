@@ -54,7 +54,8 @@ namespace BookReviewApp.Data.Seed
                 Role = "Admin",
                 IsActive = true,
                 EmailConfirmed = true,
-                IsAdmin = true
+                IsAdmin = true,
+                CreatedDate = DateTime.UtcNow
             };
 
             if (!context.Users.Any(u => u.Email == adminUser.Email))
@@ -84,7 +85,7 @@ namespace BookReviewApp.Data.Seed
                         LastName = "Reviewer",
                         Role = "User",
                         IsActive = true,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedDate = DateTime.UtcNow
                     });
                 }
             }

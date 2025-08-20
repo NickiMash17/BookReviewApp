@@ -60,8 +60,8 @@ namespace BookReviewApp.Services.Implementations
         {
             try
             {
-                // Hash the password before saving using simple SHA256
-                user.PasswordHash = HashPassword(user.PasswordHash);
+                // Hash the password using ASP.NET Core Identity PasswordHasher
+                user.PasswordHash = _passwordHasher.HashPassword(user, user.PasswordHash);
                 await _userRepository.AddAsync(user);
                 Console.WriteLine($"User {user.Username} added successfully with ID: {user.UserId}");
             }
@@ -109,18 +109,9 @@ namespace BookReviewApp.Services.Implementations
             if (user == null || !user.IsActive)
                 return false;
 
-            // For development: use simple SHA256 hashing
-            var hashedPassword = HashPassword(password);
-            return user.PasswordHash == hashedPassword;
-        }
-
-        private string HashPassword(string password)
-        {
-            using (var sha256 = SHA256.Create())
-            {
-                var hashedBytes = sha256.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-                return Convert.ToBase64String(hashedBytes);
-            }
+            // Use ASP.NET Core Identity PasswordHasher for secure password verification
+            var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, password);
+            return result == PasswordVerificationResult.Success;
         }
 
         public async Task UpdateLastLoginAsync(string userId)

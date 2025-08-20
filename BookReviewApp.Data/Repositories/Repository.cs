@@ -80,7 +80,7 @@ namespace BookReviewApp.Data.Repositories
             {
                 Console.WriteLine($"Adding entity of type {typeof(T).Name} with ID: {entity.Id}");
                 _dbSet.Add(entity);
-                await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
                 Console.WriteLine($"Entity added successfully with ID: {entity.Id}");
             }
             catch (Exception ex)

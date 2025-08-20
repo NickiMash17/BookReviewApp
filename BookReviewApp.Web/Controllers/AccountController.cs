@@ -12,12 +12,15 @@ using System.Security.Cryptography;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using BookReviewApp.Web.Utilities;
+using Microsoft.AspNetCore.Identity;
 
 namespace BookReviewApp.Web.Controllers
 {
     public class AccountController : BaseController
     {
         private readonly IUserService _userService;
+        private readonly PasswordHasher<User> _passwordHasher = new PasswordHasher<User>();
+
         public AccountController(IUserService userService)
         {
             _userService = userService;
@@ -68,7 +71,9 @@ namespace BookReviewApp.Web.Controllers
                     FirstName = model.FirstName,
                     LastName = model.LastName,
                     EmailConfirmed = true, // Auto-confirm for development
-                    IsActive = true
+                    IsActive = true,
+                    Role = "User", // Default role
+                    CreatedDate = DateTime.Now
                 };
                 
                 Console.WriteLine("Adding user to database...");
@@ -105,22 +110,26 @@ namespace BookReviewApp.Web.Controllers
 
             var user = await _userService.GetUserByEmailAsync(model.EmailOrUsername)
                        ?? await _userService.GetUserByUsernameAsync(model.EmailOrUsername);
+            
             if (user == null || !user.IsActive)
             {
                 ModelState.AddModelError("", "Invalid credentials or inactive account.");
                 return View(model);
             }
+
             if (!user.EmailConfirmed)
             {
                 ModelState.AddModelError("", "Please confirm your email before logging in.");
                 return View(model);
             }
+
             var valid = await _userService.ValidateCredentialsAsync(user.Email, model.Password);
             if (!valid)
             {
                 ModelState.AddModelError("", "Invalid credentials.");
                 return View(model);
             }
+
             // Set authentication cookie
             await SignInUser(user, model.RememberMe);
             TempData["SuccessMessage"] = $"Welcome back, {user.Username}!";
@@ -144,6 +153,7 @@ namespace BookReviewApp.Web.Controllers
             var user = await _userService.GetUserByIdAsync(userId);
             if (user == null)
                 return RedirectToAction("Login");
+            
             var model = new ProfileViewModel
             {
                 Email = user.Email,
@@ -153,6 +163,7 @@ namespace BookReviewApp.Web.Controllers
                 Role = user.Role,
                 ProfilePictureUrl = user.ProfilePictureUrl
             };
+            
             // Fetch user's reviews
             var reviews = user.Reviews?.OrderByDescending(r => r.ReviewDate).ToList() ?? new List<BookReviewApp.Domain.Models.Review>();
             ViewBag.MyReviews = reviews;
@@ -168,10 +179,12 @@ namespace BookReviewApp.Web.Controllers
             {
                 if (!ModelState.IsValid)
                     return View(model);
+                
                 var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value;
                 var user = await _userService.GetUserByIdAsync(userId);
                 if (user == null)
                     return RedirectToAction("Login");
+                
                 // Check for email/username conflicts (if changed)
                 if (user.Email != model.Email && await _userService.EmailExistsAsync(model.Email))
                 {
@@ -183,10 +196,12 @@ namespace BookReviewApp.Web.Controllers
                     ModelState.AddModelError("Username", "Username is already taken.");
                     return View(model);
                 }
+                
                 user.Email = model.Email;
                 user.Username = model.Username;
                 user.FirstName = model.FirstName;
                 user.LastName = model.LastName;
+                
                 // Handle profile image upload with validation
                 if (profileImage != null && profileImage.Length > 0)
                 {
@@ -206,6 +221,7 @@ namespace BookReviewApp.Web.Controllers
                     }
                     user.ProfilePictureUrl = $"/images/avatars/{fileName}";
                 }
+                
                 await _userService.UpdateUserAsync(user);
                 await SignInUser(user, rememberMe: false); // Refresh claims for avatar
                 TempData["SuccessMessage"] = "Profile updated successfully!";
@@ -233,17 +249,21 @@ namespace BookReviewApp.Web.Controllers
             {
                 if (!ModelState.IsValid)
                     return View(model);
+                
                 var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value;
                 var user = await _userService.GetUserByIdAsync(userId);
                 if (user == null)
                     return RedirectToAction("Login");
+                
                 var valid = await _userService.ValidateCredentialsAsync(user.Email, model.CurrentPassword);
                 if (!valid)
                 {
                     ModelState.AddModelError("CurrentPassword", "Current password is incorrect.");
                     return View(model);
                 }
-                user.PasswordHash = new Microsoft.AspNetCore.Identity.PasswordHasher<BookReviewApp.Domain.Models.User>().HashPassword(user, model.NewPassword);
+                
+                // Hash the new password
+                user.PasswordHash = _passwordHasher.HashPassword(user, model.NewPassword);
                 await _userService.UpdateUserAsync(user);
                 TempData["SuccessMessage"] = "Password changed successfully!";
                 return RedirectToAction("Profile");
@@ -265,6 +285,7 @@ namespace BookReviewApp.Web.Controllers
                 var user = await _userService.GetUserByIdAsync(userId);
                 if (user == null)
                     return RedirectToAction("Login");
+                
                 user.ProfilePictureUrl = null;
                 await _userService.UpdateUserAsync(user);
                 await SignInUser(user, rememberMe: false);
@@ -291,12 +312,14 @@ namespace BookReviewApp.Web.Controllers
             {
                 if (!ModelState.IsValid)
                     return View(model);
+                
                 var user = await _userService.GetUserByEmailAsync(model.Email);
                 if (user == null)
                 {
                     TempData["SuccessMessage"] = "If this email exists, you will receive a reset link.";
                     return RedirectToAction("Login");
                 }
+                
                 // For demo: redirect to ResetPassword with email as query param
                 return RedirectToAction("ResetPassword", new { email = model.Email });
             }
@@ -311,6 +334,7 @@ namespace BookReviewApp.Web.Controllers
         {
             if (string.IsNullOrEmpty(email))
                 return RedirectToAction("ForgotPassword");
+            
             var model = new ResetPasswordViewModel { Email = email };
             return View(model);
         }
@@ -323,14 +347,16 @@ namespace BookReviewApp.Web.Controllers
             {
                 if (!ModelState.IsValid)
                     return View(model);
+                
                 var user = await _userService.GetUserByEmailAsync(model.Email);
                 if (user == null)
                 {
                     ModelState.AddModelError("Email", "No user found with this email.");
                     return View(model);
                 }
+                
                 // Hash and update password
-                user.PasswordHash = new Microsoft.AspNetCore.Identity.PasswordHasher<BookReviewApp.Domain.Models.User>().HashPassword(user, model.NewPassword);
+                user.PasswordHash = _passwordHasher.HashPassword(user, model.NewPassword);
                 await _userService.UpdateUserAsync(user);
                 TempData["SuccessMessage"] = "Password reset successful! Please log in.";
                 return RedirectToAction("Login");
@@ -352,6 +378,7 @@ namespace BookReviewApp.Web.Controllers
                     TempData["ErrorMessage"] = "Invalid user.";
                     return RedirectToAction("Login");
                 }
+                
                 // In a real app, validate the token
                 user.EmailConfirmed = true;
                 await _userService.UpdateUserAsync(user);
@@ -365,13 +392,10 @@ namespace BookReviewApp.Web.Controllers
             }
         }
 
-        private string GenerateEmailToken(BookReviewApp.Domain.Models.User user)
+        [HttpGet]
+        public IActionResult AccessDenied()
         {
-            // For demo: simple hash of userId + email
-            using var sha256 = SHA256.Create();
-            var input = $"{user.UserId}:{user.Email}";
-            var bytes = sha256.ComputeHash(System.Text.Encoding.UTF8.GetBytes(input));
-            return Convert.ToBase64String(bytes).Replace("/", "_").Replace("+", "-");
+            return View();
         }
 
         private async Task SignInUser(User user, bool rememberMe)
@@ -383,10 +407,12 @@ namespace BookReviewApp.Web.Controllers
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Role, user.Role)
             };
+            
             if (!string.IsNullOrEmpty(user.ProfilePictureUrl))
             {
                 claims.Add(new Claim("ProfilePictureUrl", user.ProfilePictureUrl));
             }
+            
             var identity = new ClaimsIdentity(claims, "Cookies");
             var principal = new ClaimsPrincipal(identity);
             await HttpContext.SignInAsync("Cookies", principal,

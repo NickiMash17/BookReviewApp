@@ -66,6 +66,12 @@ namespace BookReviewApp.Domain.Models
         public bool EmailConfirmed { get; set; } = false;
         
         /// <summary>
+        /// The date and time when the user account was created.
+        /// </summary>
+        [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+        
+        /// <summary>
         /// The date and time of the user's last login.
         /// </summary>
         [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
